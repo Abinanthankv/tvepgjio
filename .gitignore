@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.DS_Store
+analyze_epg.py
+fuzzy_check.py
+test_jio_epg.py
