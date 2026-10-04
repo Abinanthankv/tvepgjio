@@ -1,4 +1,4 @@
-name: Generate and Update EPG
+name: Generate and Update EPG & Playlist
 
 on:
   schedule:
@@ -10,7 +10,7 @@ on:
       - main
 
 jobs:
-  build-epg:
+  build-epg-and-playlist:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -28,10 +28,14 @@ jobs:
         run: |
           python generate_epg.py
 
-      - name: Commit and push updated EPG files
+      - name: Run Playlist Generator Script
+        run: |
+          python generate_playlist.py
+
+      - name: Commit and push updated EPG & Playlist files
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Automated EPG Update [skip ci]"
-          file_pattern: 'epg.xml.gz epg.xml'
+          commit_message: "Automated EPG & Playlist Update [skip ci]"
+          file_pattern: 'epg.xml.gz epg.xml in_jio.m3u'
           commit_user_name: 'github-actions[bot]'
           commit_user_email: 'github-actions[bot]@users.noreply.github.com'

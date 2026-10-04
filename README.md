@@ -17,12 +17,18 @@ https://Abinanthankv.github.io/tvepgjio/
 
 ## 🔗 Direct URLs for IPTV Players (TiviMate / OTT Navigator / Kodi / IPTV Smarters)
 
-### 1. Indian Jio EPG URL
+### 1. All-in-One Indian Jio M3U Playlist (With Embedded Jio EPG) ⭐ *[RECOMMENDED]*
+```text
+https://raw.githubusercontent.com/Abinanthankv/tvepgjio/main/in_jio.m3u
+```
+*(This single link embeds `#EXTM3U url-tvg="..."` so your IPTV player automatically loads streams AND the TV guide without manual setup).*
+
+### 2. Standalone Indian Jio EPG URL
 ```text
 https://raw.githubusercontent.com/Abinanthankv/tvepgjio/main/epg.xml.gz
 ```
 
-### 2. USA TV Next Converted M3U Playlist
+### 3. USA TV Next Converted M3U Playlist
 ```text
 https://raw.githubusercontent.com/Abinanthankv/tvepgjio/main/usa_tv_next.m3u
 ```
@@ -31,12 +37,9 @@ https://raw.githubusercontent.com/Abinanthankv/tvepgjio/main/usa_tv_next.m3u
 
 ## ⚡ Features & Workflows
 
-* **USA TV Next M3U Workflow** (`update-usa-m3u.yml`):
-  - Converts 169+ US live streams (ABC, CBS, NBC, FOX, ESPN, HBO, etc.) from the Stremio `usa-tv-next` addon into `#EXTM3U`.
-  - Runs **once daily** automatically (`cron: '0 0 * * *'`) or **manually on demand** via GitHub Actions.
-* **Jio EPG Workflow** (`generate-epg.yml`):
-  - Maps 580+ Indian channels from `in.m3u` including stream variants (`@SD`, `@HD`, `@1080p`, etc.) to Jio schedules.
-  - Runs **every 6 hours** automatically (`cron: '0 */6 * * *'`) or **manually on demand**.
+* **All-in-One Integrated Playlist (`in_jio.m3u`)**: Contains 835+ Indian live streams with embedded `url-tvg` pointing to your Jio EPG guide.
+* **Jio EPG Workflow** (`generate-epg.yml`): Maps 580+ Indian channels from `in.m3u` to Jio schedules. Runs **every 6 hours** automatically (`cron: '0 */6 * * *'`).
+* **USA TV Next M3U Workflow** (`update-usa-m3u.yml`): Converts 169+ US live streams from `usa-tv-next` into `#EXTM3U`. Runs **once daily** (`cron: '0 0 * * *'`).
 
 ---
 
@@ -44,9 +47,7 @@ https://raw.githubusercontent.com/Abinanthankv/tvepgjio/main/usa_tv_next.m3u
 
 1. Go to your repository on GitHub: `https://github.com/Abinanthankv/tvepgjio`.
 2. Click the **Actions** tab.
-3. Select either:
-   - **Update USA TV Next M3U Playlist** ➔ Click **Run workflow**.
-   - **Generate and Update EPG** ➔ Click **Run workflow**.
+3. Select **Generate and Update EPG & Playlist** ➔ Click **Run workflow**.
 
 ---
 
