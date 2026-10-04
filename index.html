@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TVEPG Jio - Interactive TV Guide & EPG Browser</title>
+  
+  <!-- SEO & Meta -->
+  <meta name="description" content="Browse IPTV M3U playlists and inspect matching Jio EPG program guide data online in real time.">
+  <meta name="theme-color" content="#0b0f19">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- fflate for fast browser GZip decompression -->
+  <script src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js"></script>
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Top Header -->
+    <header class="header">
+      <div class="logo-section">
+        <div class="logo-icon">
+          <i class="fa-solid fa-tv"></i>
+        </div>
+        <div class="logo-text">
+          <h1>TVEPG Jio Browser</h1>
+          <p>Interactive IPTV Playlist & Jio EPG Inspector</p>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <a href="https://github.com/Abinanthankv/tvepgjio" target="_blank" class="repo-btn">
+          <i class="fa-brands fa-github"></i>
+          <span>GitHub Repo</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Playlist & EPG Config Card -->
+    <section class="config-card">
+      <div class="config-header">
+        <div class="config-title">
+          <i class="fa-solid fa-sliders"></i>
+          <span>Playlist & TV Guide Sources</span>
+        </div>
+        <div class="source-tabs">
+          <button class="tab-btn active" id="tabUrlBtn" onclick="switchTab('url')"><i class="fa-solid fa-link"></i> Web URLs</button>
+          <button class="tab-btn" id="tabFileBtn" onclick="switchTab('file')"><i class="fa-solid fa-file-arrow-up"></i> Local Files</button>
+        </div>
+      </div>
+
+      <!-- URL Inputs View -->
+      <div id="urlInputsSection">
+        <div class="inputs-grid">
+          <div class="input-group">
+            <label class="input-label" for="m3uUrlInput">
+              <span>M3U Playlist URL</span>
+              <span style="font-size:0.75rem; color:var(--accent-cyan)">IPTV-Org India</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-list-ul"></i>
+              <input type="url" id="m3uUrlInput" class="input-field" 
+                     value="https://iptv-org.github.io/iptv/countries/in.m3u" 
+                     placeholder="https://.../playlist.m3u">
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label class="input-label" for="epgUrlInput">
+              <span>EPG Guide URL (.xml or .xml.gz)</span>
+              <span style="font-size:0.75rem; color:var(--success-color)">Jio EPG Active</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-calendar-days"></i>
+              <input type="url" id="epgUrlInput" class="input-field" 
+                     value="https://raw.githubusercontent.com/Abinanthankv/tvepgjio/main/epg.xml.gz" 
+                     placeholder="https://.../epg.xml.gz">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- File Upload Inputs View -->
+      <div id="fileInputsSection" style="display: none;">
+        <div class="inputs-grid">
+          <div class="input-group">
+            <label class="input-label">M3U Playlist File (.m3u / .m3u8)</label>
+            <label for="m3uFileInput" class="file-dropzone">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span id="m3uFileName">Choose or Drag & Drop M3U Playlist</span>
+              <input type="file" id="m3uFileInput" class="file-input" accept=".m3u,.m3u8,.txt">
+            </label>
+          </div>
+
+          <div class="input-group">
+            <label class="input-label">EPG Guide File (.xml / .xml.gz)</label>
+            <label for="epgFileInput" class="file-dropzone">
+              <i class="fa-solid fa-file-code"></i>
+              <span id="epgFileName">Choose or Drag & Drop EPG File</span>
+              <input type="file" id="epgFileInput" class="file-input" accept=".xml,.gz">
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <button id="resetBtn" class="btn btn-secondary" onclick="resetDefaults()">
+          <i class="fa-solid fa-rotate-left"></i> Reset Defaults
+        </button>
+        <button id="loadBtn" class="btn btn-primary" onclick="loadData()">
+          <i class="fa-solid fa-play"></i> Load & Parse TV Guide
+        </button>
+      </div>
+    </section>
+
+    <!-- Key Statistics Grid -->
+    <section class="stats-grid">
+      <div class="stat-card blue">
+        <div class="stat-icon"><i class="fa-solid fa-tv"></i></div>
+        <div class="stat-details">
+          <span class="stat-value" id="statTotalChannels">0</span>
+          <span class="stat-label">Total Channels</span>
+        </div>
+      </div>
+
+      <div class="stat-card green">
+        <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-details">
+          <span class="stat-value" id="statMatchedChannels">0</span>
+          <span class="stat-label">EPG Matched</span>
+        </div>
+      </div>
+
+      <div class="stat-card purple">
+        <div class="stat-icon"><i class="fa-solid fa-list-check"></i></div>
+        <div class="stat-details">
+          <span class="stat-value" id="statTotalProgrammes">0</span>
+          <span class="stat-label">Schedule Listings</span>
+        </div>
+      </div>
+
+      <div class="stat-card cyan">
+        <div class="stat-icon"><i class="fa-solid fa-chart-pie"></i></div>
+        <div class="stat-details">
+          <span class="stat-value" id="statCoverageRate">0%</span>
+          <span class="stat-label">EPG Coverage</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Controls & Filter Bar -->
+    <section class="controls-bar">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search by channel title, tvg-id, or program name...">
+      </div>
+
+      <div class="filter-group">
+        <select id="groupFilter" class="filter-select">
+          <option value="ALL">All Categories</option>
+        </select>
+
+        <select id="statusFilter" class="filter-select">
+          <option value="ALL">All EPG Status</option>
+          <option value="MATCHED">Matched EPG Only</option>
+          <option value="UNMATCHED">Missing EPG Only</option>
+        </select>
+
+        <div class="view-toggle">
+          <button class="view-btn active" id="viewGridBtn" title="Grid View" onclick="setViewMode('grid')">
+            <i class="fa-solid fa-border-all"></i>
+          </button>
+          <button class="view-btn" id="viewListBtn" title="List View" onclick="setViewMode('list')">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Channel Container / Loading -->
+    <main id="mainContainer">
+      <div class="loading-overlay" id="initialPrompt">
+        <i class="fa-solid fa-circle-play" style="font-size: 3.5rem; color: var(--accent-cyan); margin-bottom: 0.5rem;"></i>
+        <h2>Ready to Load TV Guide</h2>
+        <p style="color: var(--text-secondary)">Click <strong>"Load & Parse TV Guide"</strong> above to fetch the M3U playlist and Jio EPG schedules.</p>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Program Details Modal -->
+  <div id="programModal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModalDirect()"><i class="fa-solid fa-xmark"></i></button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- Main JavaScript App Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
