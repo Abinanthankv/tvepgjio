@@ -29,19 +29,24 @@ https://raw.githubusercontent.com/Abinanthankv/tvepgjio/main/usa_tv_next.m3u
 
 ---
 
-## ⚡ Features
+## ⚡ Features & Workflows
 
-* **USA TV Next to M3U Converter**: Converted 169+ US live streams (ABC, CBS, NBC, FOX, ESPN, HBO, etc.) from the Stremio `usa-tv-next` addon into a standard `#EXTM3U` playlist (`usa_tv_next.m3u`).
-* **Jio EPG Adapter**: Directly maps over 580+ Indian channels from `in.m3u` including stream variants (`@SD`, `@HD`, `@1080p`, etc.).
-* **Automated Updates**: Powered by **GitHub Actions** — runs every 6 hours (`cron: '0 */6 * * *'`) and updates the repository automatically.
+* **USA TV Next M3U Workflow** (`update-usa-m3u.yml`):
+  - Converts 169+ US live streams (ABC, CBS, NBC, FOX, ESPN, HBO, etc.) from the Stremio `usa-tv-next` addon into `#EXTM3U`.
+  - Runs **once daily** automatically (`cron: '0 0 * * *'`) or **manually on demand** via GitHub Actions.
+* **Jio EPG Workflow** (`generate-epg.yml`):
+  - Maps 580+ Indian channels from `in.m3u` including stream variants (`@SD`, `@HD`, `@1080p`, etc.) to Jio schedules.
+  - Runs **every 6 hours** automatically (`cron: '0 */6 * * *'`) or **manually on demand**.
 
 ---
 
-## 🚀 How to Sync & Push Changes
+## 🚀 How to Manually Trigger Workflows on GitHub
 
-```bash
-git push origin main
-```
+1. Go to your repository on GitHub: `https://github.com/Abinanthankv/tvepgjio`.
+2. Click the **Actions** tab.
+3. Select either:
+   - **Update USA TV Next M3U Playlist** ➔ Click **Run workflow**.
+   - **Generate and Update EPG** ➔ Click **Run workflow**.
 
 ---
 

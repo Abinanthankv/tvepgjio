@@ -1,0 +1,39 @@
+name: Update USA TV Next M3U Playlist
+
+on:
+  schedule:
+    # Run once daily at 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Manual trigger button in GitHub Actions UI
+  push:
+    branches:
+      - main
+    paths:
+      - 'convert_stremio_to_m3u.py'
+
+jobs:
+  update-usa-m3u:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Run USA M3U Converter Script
+        run: |
+          python convert_stremio_to_m3u.py
+
+      - name: Commit and push updated USA M3U playlist
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Automated USA M3U Update [skip ci]"
+          file_pattern: 'usa_tv_next.m3u'
+          commit_user_name: 'github-actions[bot]'
+          commit_user_email: 'github-actions[bot]@users.noreply.github.com'
