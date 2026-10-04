@@ -9,7 +9,7 @@ Automated Electronic Program Guide (EPG) generator that fetches full TV schedule
 Once you host this repository on GitHub, your direct EPG URL will be:
 
 ```text
-https://raw.githubusercontent.com/<YOUR_GITHUB_USERNAME>/<YOUR_REPO_NAME>/main/epg.xml.gz
+https://raw.githubusercontent.com/<YOUR_GITHUB_USERNAME>/tvepgjio/main/epg.xml.gz
 ```
 
 *(You can also use `epg.xml` if your player requires uncompressed XML).*
@@ -34,14 +34,14 @@ https://raw.githubusercontent.com/<YOUR_GITHUB_USERNAME>/<YOUR_REPO_NAME>/main/e
 
 ### 1. Initialize Git and Push to GitHub
 
-Run the following commands in your local directory:
+Create a new GitHub repository named `tvepgjio` and run the following commands:
 
 ```bash
 git init
 git add .
 git commit -m "Initial commit: EPG adapter and workflow"
 git branch -M main
-git remote add origin https://github.com/<YOUR_GITHUB_USERNAME>/<YOUR_REPO_NAME>.git
+git remote add origin https://github.com/<YOUR_GITHUB_USERNAME>/tvepgjio.git
 git push -u origin main
 ```
 
