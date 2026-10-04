@@ -45,5 +45,14 @@ git push origin main
 
 ---
 
+## ⚖️ Legal & DMCA Disclaimer
+
+- **Publicly Available Information**: All playlist links (`.m3u`), Electronic Program Guides (`.xml` / `.xml.gz`), channel logos, and metadata indexed by this project are parsed from freely and publicly accessible resources available on the internet.
+- **No Content Hosting**: This repository does **NOT** host, store, retransmit, or broadcast any video, audio, media files, or copyrighted streams. All stream links point directly to external, unassociated third-party servers over which we have no control.
+- **Fair Use & Non-Infringement**: This repository acts strictly as an automated metadata parser and indexer for educational and personal use under Fair Use guidelines.
+- **DMCA Exemption Notice**: Because this repository functions exclusively as a data aggregator and does not store or distribute copyrighted media files, it is **not subject to DMCA takedown claims** regarding content hosting. If you believe an external stream link infringes your copyright, please contact the respective third-party host server or domain administrator directly.
+
+---
+
 ## 📄 License
 MIT License
