@@ -28,9 +28,16 @@ https://raw.githubusercontent.com/Abinanthankv/tvepgjio/main/in_jio.m3u
 https://raw.githubusercontent.com/Abinanthankv/tvepgjio/main/epg.xml.gz
 ```
 
-### 3. USA TV Next Converted M3U Playlist
+### 3. USA TV Next Playlist (With Embedded USA EPG) ⭐
 ```text
 https://raw.githubusercontent.com/Abinanthankv/tvepgjio/main/usa_tv_next.m3u
+```
+*The playlist embeds `url-tvg` / `x-tvg-url` pointing at the matching USA guide, so
+channels and schedules load together.*
+
+### 4. Standalone USA EPG URL
+```text
+https://raw.githubusercontent.com/Abinanthankv/tvepgjio/main/usa_epg.xml.gz
 ```
 
 ---
@@ -39,7 +46,15 @@ https://raw.githubusercontent.com/Abinanthankv/tvepgjio/main/usa_tv_next.m3u
 
 * **All-in-One Integrated Playlist (`in_jio.m3u`)**: Contains 840+ Indian live streams with embedded `url-tvg` pointing to your Jio EPG guide. Channel names, logos, groups and per-channel options are copied exactly from the upstream playlist.
 * **Jio EPG Workflow** (`generate-epg.yml`): Maps Indian channels from `in.m3u` to Jio schedules. Runs **every 6 hours** automatically (`cron: '0 */6 * * *'`).
-* **USA TV Next M3U Workflow** (`update-usa-m3u.yml`): Converts 169+ US live streams from `usa-tv-next` into `#EXTM3U`. Runs **once daily** (`cron: '0 0 * * *'`).
+* **USA TV Next Workflow** (`update-usa-m3u.yml`): Converts the `usa-tv-next`
+  catalog into a cleaned M3U, then builds a compact USA XMLTV guide. Runs
+  **once daily** (`cron: '0 0 * * *'`) and commits
+  `usa_tv_next.m3u`, `usa_epg.xml.gz` and `usa_epg_report.csv`.
+* **Cleaned USA output**: audio-only streams, dead feeds, duplicate URLs,
+  UUID titles and known non-US/junk feeds (for example the Australian
+  `abc-*` feeds and the `*_in_90_seconds` clips) are removed. Every remaining
+  feed gets a unique `Channel (Source - Quality)` title, stable `tvg-id`, a
+  `USA | <Genre>` group and a deterministic sort order.
 
 ---
 
@@ -87,13 +102,50 @@ python generate_epg.py \
   --report /tmp/epg_match_report.csv
 ```
 
+### USA TV Next guide
+
+The USA guide is built from two public XMLTV sources
+(`epg.kanya.io` and `epgshare01`). `usa_epg_aliases.json` records the exact
+source channel id for every playlist channel; `generate_usa_epg.py` keeps only
+those channels, rewrites their ids to match the playlist, and writes:
+
+* `usa_epg.xml` / `usa_epg.xml.gz` — compact guide used by the playlist.
+* `usa_epg_report.csv` — per-channel audit (`status`, `source`, `source_id`,
+  `programmes`). Channels without a confident mapping are marked `unmapped`
+  rather than being guessed.
+
+To fix or add a USA channel:
+
+1. Find the source channel id in the guide (for example `ABC.us@East`).
+2. Add it to `usa_epg_aliases.json`:
+   ```json
+   {
+     "ABC": { "source": "kanya", "id": "ABC.us@East" }
+   }
+   ```
+3. Re-run:
+   ```bash
+   python convert_stremio_to_m3u.py
+   python generate_usa_epg.py
+   ```
+
+Local regeneration without touching the published guide:
+
+```bash
+python generate_usa_epg.py \
+  --output /tmp/usa_epg.xml \
+  --output-gz /tmp/usa_epg.xml.gz \
+  --report /tmp/usa_epg_report.csv
+```
+
 ---
 
 ## 🚀 How to Manually Trigger Workflows on GitHub
 
 1. Go to your repository on GitHub: `https://github.com/Abinanthankv/tvepgjio`.
 2. Click the **Actions** tab.
-3. Select **Generate and Update EPG & Playlist** ➔ Click **Run workflow**.
+3. Select **Generate and Update EPG & Playlist** (Jio) or **Update USA TV Next
+   M3U Playlist** (USA) ➔ Click **Run workflow**.
 
 ---
 

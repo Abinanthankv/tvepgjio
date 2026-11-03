@@ -1,102 +1,418 @@
 #!/usr/bin/env python3
-import os
+"""Convert the USA TV Next Stremio addon into a clean, EPG-ready M3U.
+
+The upstream addon exposes every stream it knows about, including audio-only
+feeds, duplicate quality variants and a few feeds that do not belong to the
+channel at all.  This converter:
+
+* drops audio-only, dead, macro-filled and known non-US/junk streams;
+* removes duplicate URLs (ignoring tracking parameters);
+* gives every feed a unique, readable title (channel + source + quality);
+* uses stable XMLTV ids that match ``usa_epg.xml.gz``;
+* attaches the generated USA guide through ``url-tvg`` / ``x-tvg-url``;
+* sorts channels by genre and name so the output is deterministic.
+
+Usage:
+    python convert_stremio_to_m3u.py
+    python convert_stremio_to_m3u.py --repo-dir /tmp/opencode/usa-tv-next
+"""
+
+from __future__ import annotations
+
+import argparse
+import html
 import json
 import re
+import shutil
 import subprocess
+from collections import Counter
+from pathlib import Path
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
-TMP_DIR = '/tmp/usa-tv-next'
-OUTPUT_FILE = 'usa_tv_next.m3u'
+from usa_epg_common import canonical_id, clean_channel_name
 
-print("==================================================")
-print("     USA TV Next Stremio Addon to M3U Converter")
-print("==================================================")
+UPSTREAM_REPO = "https://github.com/yowmamasita/usa-tv-next"
+DEFAULT_REPO_DIR = Path("/tmp/usa-tv-next")
+DEFAULT_OUTPUT = Path("usa_tv_next.m3u")
+DEFAULT_EPG_URL = (
+    "https://raw.githubusercontent.com/Abinanthankv/tvepgjio/main/usa_epg.xml.gz"
+)
+ALIASES_FILE = Path("usa_epg_aliases.json")
 
-if not os.path.exists(TMP_DIR):
-    print("[1/3] Cloning yowmamasita/usa-tv-next repository...")
-    subprocess.run(['git', 'clone', '--depth', '1', 'https://github.com/yowmamasita/usa-tv-next', TMP_DIR], check=True)
-else:
-    print("[1/3] Updating local yowmamasita/usa-tv-next repository...")
-    subprocess.run(['git', '-C', TMP_DIR, 'pull'], check=False)
+GROUP_ORDER = [
+    "Local",
+    "News",
+    "Sports",
+    "Entertainment",
+    "Premium",
+    "Lifestyle",
+    "Kids",
+    "Documentaries",
+    "Music",
+    "Latino",
+    "General",
+]
+QUALITY_RANK = {"4K": 4, "UHD": 4, "FHD": 3, "HD": 2, "SD": 1}
 
-catalog_path = os.path.join(TMP_DIR, 'catalog/tv/all.json')
-with open(catalog_path, 'r', encoding='utf-8') as f:
-    catalog = json.load(f)
+# Feeds that are clearly not the US channel the catalog entry claims to be.
+JUNK_URL_PATTERNS = [
+    r"abc-(?:nsw|qld|sa|me|tv-plus)\b",
+    r"(?:weather|news|business|sport)_in_90_seconds",
+    r"tvpass\.org",
+    r"tvkaista\.net",
+    r"qvcuk",
+]
+JUNK_URL_RE = re.compile("|".join(JUNK_URL_PATTERNS), re.IGNORECASE)
+MACRO_URL_RE = re.compile(r"\{[A-Z_]+\}")
+DEAD_STREAM_RE = re.compile(r"\[dead\]|\bdead\b|\boffline\b|\bnot working\b", re.I)
 
-metas = catalog.get('metas', [])
-print(f"[2/3] Parsed {len(metas)} catalog items.")
+# Friendly names for the short tags the upstream harvester stores in the
+# stream description (``HV:JMP2``, ``HV:SERVICE-STIT``, ...).
+TAG_SOURCES = {
+    "JMP2": "JMP2",
+    "LIVE-MANIFES": "Tubi",
+    "LIVE-MANIFEST": "Tubi",
+    "SERVICE-STIT": "Pluto TV",
+    "PTV": "Pluto TV",
+    "AMD-MEDIATOR": "Amagi",
+    "CDN-UW2-PROD": "Amagi",
+    "AEGIS-CLOUDF": "Tubi",
+    "XM": "Xumo",
+    "MJE": "MJE",
+    "ST": "Stirr",
+    "LN": "Local Now",
+    "HLS": "",
+    "MASTER": "",
+    "CLIENTS": "",
+    "INDEX": "",
+}
 
-def get_stream_label(channel_name, stream_item):
-    url = stream_item.get('url', '')
-    desc = stream_item.get('description', '')
-    q_name = stream_item.get('name', '')
-    
-    label_parts = []
-    
-    # Extract regional affiliate or station callsign from URL if present
-    match = re.search(r'live/([a-z0-9\-]+)', url, re.IGNORECASE)
-    if match:
-        station = match.group(1).upper()
-        if 'WABC' in station: label_parts.append('WABC New York')
-        elif 'KABC' in station: label_parts.append('KABC Los Angeles')
-        elif 'WCBS' in station: label_parts.append('WCBS New York')
-        elif 'KCBS' in station or 'CBS-KCBS' in station: label_parts.append('KCBS Los Angeles')
-        elif 'WNBC' in station: label_parts.append('WNBC New York')
-        elif 'KNBC' in station or 'NBC-KNBC' in station: label_parts.append('KNBC Los Angeles')
-        elif 'WNYW' in station: label_parts.append('WNYW New York')
-        elif 'KTTV' in station or 'FOX-KTTV' in station: label_parts.append('KTTV Los Angeles')
-        elif 'WPIX' in station: label_parts.append('WPIX New York')
-        else: label_parts.append(station)
-    elif 'uplynk' in url:
-        label_parts.append('Primary Feed')
-    elif 'pluto' in url:
-        label_parts.append('Pluto Feed')
-    elif desc and not desc.startswith('HV:'):
-        label_parts.append(desc)
-        
-    if q_name and q_name != 'Audio':
-        label_parts.append(q_name)
-        
-    if label_parts:
-        return f"{channel_name} ({' - '.join(label_parts)})"
-    return channel_name
+# Prefer the actual host over the cryptic harvester tag when we recognise it.
+HOST_SOURCES = [
+    ("pluto.tv", "Pluto TV"),
+    ("tubi", "Tubi"),
+    ("amagi.tv", "Amagi"),
+    ("uplynk", "Uplynk"),
+    ("jmp2.uk", "JMP2"),
+    ("mjh.nz", "MJH"),
+    ("bloomberg.com", "Bloomberg"),
+    ("dai.google.com", "Google DAI"),
+    ("xumo", "Xumo"),
+    ("roku", "Roku"),
+    ("samsung", "Samsung TV Plus"),
+    ("plex.tv", "Plex"),
+    ("akamaized", "Akamai"),
+    ("cloudfront", "CloudFront"),
+]
 
-m3u_lines = ['#EXTM3U']
-stream_count = 0
-seen_urls = set()
+TRACKING_PARAMS = {
+    "checkedby",
+    "fbclid",
+    "gclid",
+    "dclid",
+    "msclkid",
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "utm_term",
+    "utm_content",
+}
 
-for m in metas:
-    ch_id = m.get('id')
-    name = m.get('name', 'Channel')
-    poster = m.get('poster', '')
-    logo = m.get('logo', '') or poster
-    genres = m.get('genres', [])
-    group = genres[0] if genres else 'General'
-    
-    stream_file = os.path.join(TMP_DIR, f'stream/tv/{ch_id}.json')
-    if os.path.exists(stream_file):
-        with open(stream_file, 'r', encoding='utf-8') as sf:
-            s_data = json.load(sf)
-            streams = s_data.get('streams', [])
-            
-            for s in streams:
-                url = s.get('url')
-                q_name = s.get('name', '')
-                
-                # Filter out audio-only streams and duplicates
-                if not url or url in seen_urls or q_name == 'Audio':
-                    continue
-                    
-                seen_urls.add(url)
-                
-                title = get_stream_label(name, s)
-                tvg_id = name.replace(' ', '') + '.us'
-                
-                m3u_lines.append(f'#EXTINF:-1 tvg-id="{tvg_id}" tvg-name="{name}" tvg-logo="{logo}" group-title="{group}",{title}')
-                m3u_lines.append(url)
-                stream_count += 1
 
-print(f"[3/3] Writing cleaned {OUTPUT_FILE}...")
-with open(OUTPUT_FILE, 'w', encoding='utf-8') as out:
-    out.write('\n'.join(m3u_lines) + '\n')
+def ensure_repo(repo_dir: Path, update: bool) -> None:
+    """Clone the upstream addon, or refresh an existing checkout."""
+    if (repo_dir / ".git").is_dir():
+        if update:
+            print(f"[1/4] Updating {repo_dir} ...")
+            result = subprocess.run(
+                ["git", "-C", str(repo_dir), "pull", "--ff-only"],
+                capture_output=True,
+                text=True,
+            )
+            if result.returncode != 0:
+                print("      pull failed; using the existing checkout")
+        return
 
-print(f"\n🎉 SUCCESS! Generated {OUTPUT_FILE} containing {stream_count} active video streams across {len(metas)} channels.")
+    if repo_dir.exists():
+        shutil.rmtree(repo_dir)
+    print(f"[1/4] Cloning {UPSTREAM_REPO} ...")
+    subprocess.run(
+        ["git", "clone", "--depth", "1", UPSTREAM_REPO, str(repo_dir)],
+        check=True,
+    )
+
+
+def load_streams(repo_dir: Path, meta: dict) -> list[dict]:
+    """Return catalog streams, with the stream endpoint taking precedence."""
+    by_url: dict[str, dict] = {}
+    for stream in meta.get("streams") or []:
+        url = (stream.get("url") or "").strip() if isinstance(stream, dict) else ""
+        if url:
+            by_url[url] = stream
+
+    stream_file = repo_dir / "stream" / "tv" / f"{meta.get('id', '')}.json"
+    if stream_file.is_file():
+        try:
+            payload = json.loads(stream_file.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            payload = {}
+        for stream in payload.get("streams") or []:
+            url = (stream.get("url") or "").strip() if isinstance(stream, dict) else ""
+            if url:
+                by_url[url] = stream
+
+    return list(by_url.values())
+
+
+def quality_of(stream: dict) -> str:
+    """Return 4K/UHD/FHD/HD/SD/Audio from the upstream stream name."""
+    raw = (stream.get("name") or "").upper()
+    if "AUDIO" in raw:
+        return "Audio"
+    match = re.search(r"\b(4K|UHD|FHD|HD|SD)\b", raw)
+    return match.group(1) if match else "SD"
+
+
+def is_dead(stream: dict) -> bool:
+    text = f"{stream.get('name', '')} {stream.get('description', '')}"
+    return bool(DEAD_STREAM_RE.search(text))
+
+
+def source_of(stream: dict) -> str:
+    """Return a short, human-readable source label for a feed."""
+    url = stream.get("url") or ""
+    host = (urlsplit(url).hostname or "").lower()
+    for needle, label in HOST_SOURCES:
+        if needle in host:
+            return label
+
+    description = (stream.get("description") or "").strip()
+    tag = description[3:].strip() if description.upper().startswith("HV:") else description
+    tag = tag.upper()
+    if tag in TAG_SOURCES:
+        return TAG_SOURCES[tag]
+    if re.fullmatch(r"[0-9A-F]{8,}", tag) or tag.isdigit():
+        return ""
+    if tag and len(tag) <= 12:
+        return tag
+    return ""
+
+
+def normalize_url(url: str) -> str:
+    """Normalize a URL for duplicate detection without dropping required params."""
+    parts = urlsplit(url)
+    query = [
+        (key, value)
+        for key, value in parse_qsl(parts.query, keep_blank_values=True)
+        if key.lower() not in TRACKING_PARAMS
+    ]
+    return urlunsplit(
+        (
+            parts.scheme.lower(),
+            parts.netloc.lower(),
+            parts.path,
+            urlencode(query, doseq=True),
+            "",
+        )
+    )
+
+
+def m3u_attr(value: str) -> str:
+    """Escape a value for an M3U attribute."""
+    return html.escape(str(value), quote=True)
+
+
+def build(repo_dir: Path, output: Path, epg_url: str) -> int:
+    catalog_file = repo_dir / "catalog" / "tv" / "all.json"
+    if not catalog_file.is_file():
+        print(f"ERROR: catalog not found at {catalog_file}")
+        return 1
+
+    catalog = json.loads(catalog_file.read_text(encoding="utf-8"))
+    metas = catalog.get("metas") or []
+    stats: Counter[str] = Counter()
+    channels: list[dict] = []
+
+    for meta in metas:
+        name = clean_channel_name(meta.get("name") or "Channel")
+        genre = (meta.get("genre") or (meta.get("genres") or ["General"])[0] or "General").strip()
+        if genre not in GROUP_ORDER:
+            genre = genre.title()
+        logo = meta.get("logo") or meta.get("poster") or ""
+
+        kept: list[dict] = []
+        seen_urls: dict[str, int] = {}
+        for stream in load_streams(repo_dir, meta):
+            stats["upstream_streams"] += 1
+            url = (stream.get("url") or "").strip()
+            if not url:
+                stats["filtered_missing_url"] += 1
+                continue
+            if quality_of(stream) == "Audio":
+                stats["filtered_audio"] += 1
+                continue
+            if is_dead(stream):
+                stats["filtered_dead"] += 1
+                continue
+            if JUNK_URL_RE.search(url):
+                stats["filtered_junk"] += 1
+                continue
+            if MACRO_URL_RE.search(url):
+                stats["filtered_macro"] += 1
+                continue
+
+            dedupe_key = normalize_url(url)
+            if dedupe_key in seen_urls:
+                stats["filtered_duplicate"] += 1
+                # Prefer the version without tracking parameters.
+                if url == dedupe_key:
+                    kept[seen_urls[dedupe_key]]["url"] = url
+                continue
+            seen_urls[dedupe_key] = len(kept)
+
+            kept.append(
+                {
+                    "url": url,
+                    "quality": quality_of(stream),
+                    "source": source_of(stream),
+                }
+            )
+
+        if not kept:
+            stats["channels_without_streams"] += 1
+            continue
+
+        kept.sort(
+            key=lambda item: (
+                -QUALITY_RANK.get(item["quality"], 0),
+                item["source"].casefold(),
+                normalize_url(item["url"]),
+            )
+        )
+
+        base_labels = []
+        for item in kept:
+            parts = [part for part in (item["source"], item["quality"]) if part]
+            base_labels.append(f"{name} ({' - '.join(parts)})" if parts else name)
+
+        totals = Counter(base_labels)
+        seen_labels: Counter[str] = Counter()
+        for item, base in zip(kept, base_labels):
+            seen_labels[base] += 1
+            if totals[base] == 1 or seen_labels[base] == 1:
+                item["title"] = base
+            else:
+                item["title"] = f"{base} #{seen_labels[base]}"
+
+        channels.append(
+            {"name": name, "genre": genre, "logo": logo, "streams": kept}
+        )
+
+    group_rank = {group: index for index, group in enumerate(GROUP_ORDER)}
+    channels.sort(
+        key=lambda channel: (
+            group_rank.get(channel["genre"], len(GROUP_ORDER)),
+            channel["name"].casefold(),
+        )
+    )
+
+    aliases: dict[str, dict] = {}
+    if ALIASES_FILE.is_file():
+        try:
+            raw_aliases = json.loads(ALIASES_FILE.read_text(encoding="utf-8"))
+            aliases = {
+                clean_channel_name(name): value
+                for name, value in raw_aliases.items()
+            }
+        except json.JSONDecodeError:
+            aliases = {}
+
+    lines = [f'#EXTM3U url-tvg="{m3u_attr(epg_url)}" x-tvg-url="{m3u_attr(epg_url)}"']
+    stream_count = 0
+    mapped_channels = 0
+    for channel in channels:
+        tvg_id = canonical_id(channel["name"])
+        if channel["name"] in aliases:
+            mapped_channels += 1
+        group = f"USA | {channel['genre']}"
+        for item in channel["streams"]:
+            lines.append(
+                f'#EXTINF:-1 tvg-id="{m3u_attr(tvg_id)}" '
+                f'tvg-name="{m3u_attr(channel["name"])}" '
+                f'tvg-logo="{m3u_attr(channel["logo"])}" '
+                f'group-title="{m3u_attr(group)}",{m3u_attr(item["title"])}'
+            )
+            lines.append(item["url"])
+            stream_count += 1
+
+    output.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    print(f"[2/4] Parsed {len(metas)} upstream channels, {stats['upstream_streams']} streams.")
+    print(
+        "      Filtered: "
+        f"audio={stats['filtered_audio']}, "
+        f"dead={stats['filtered_dead']}, "
+        f"junk={stats['filtered_junk']}, "
+        f"macro={stats['filtered_macro']}, "
+        f"duplicate={stats['filtered_duplicate']}, "
+        f"missing_url={stats['filtered_missing_url']}"
+    )
+    print(
+        f"[3/4] Wrote {output} with {stream_count} streams from "
+        f"{len(channels)} channels ({stats['channels_without_streams']} upstream "
+        "channels had no usable stream)."
+    )
+    print(
+        f"[4/4] EPG ids use {mapped_channels}/{len(channels)} mapped channels; "
+        f"guide: {epg_url}"
+    )
+
+    for genre in GROUP_ORDER:
+        count = sum(1 for channel in channels if channel["genre"] == genre)
+        if count:
+            print(f"      {genre:<16} {count:>3} channels")
+
+    return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--repo-dir",
+        type=Path,
+        default=DEFAULT_REPO_DIR,
+        help="checkout of yowmamasita/usa-tv-next (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=DEFAULT_OUTPUT,
+        help="output M3U file (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--epg-url",
+        default=DEFAULT_EPG_URL,
+        help="XMLTV URL embedded in #EXTM3U (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--no-update",
+        action="store_true",
+        help="use an existing checkout without running git pull",
+    )
+    args = parser.parse_args()
+
+    print("==================================================")
+    print("     USA TV Next Stremio Addon to M3U Converter")
+    print("==================================================")
+
+    try:
+        ensure_repo(args.repo_dir, update=not args.no_update)
+    except subprocess.CalledProcessError as exc:
+        print(f"ERROR: could not clone/update the upstream repository: {exc}")
+        return 1
+
+    return build(args.repo_dir, args.output, args.epg_url)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

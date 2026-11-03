@@ -10,6 +10,9 @@ on:
       - main
     paths:
       - 'convert_stremio_to_m3u.py'
+      - 'generate_usa_epg.py'
+      - 'usa_epg_common.py'
+      - 'usa_epg_aliases.json'
 
 jobs:
   update-usa-m3u:
@@ -30,10 +33,14 @@ jobs:
         run: |
           python convert_stremio_to_m3u.py
 
-      - name: Commit and push updated USA M3U playlist
+      - name: Generate USA EPG
+        run: |
+          python generate_usa_epg.py
+
+      - name: Commit and push updated USA playlist and guide
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Automated USA M3U Update [skip ci]"
-          file_pattern: 'usa_tv_next.m3u'
+          commit_message: "Automated USA M3U & EPG Update [skip ci]"
+          file_pattern: 'usa_tv_next.m3u usa_epg.xml usa_epg.xml.gz usa_epg_report.csv'
           commit_user_name: 'github-actions[bot]'
           commit_user_email: 'github-actions[bot]@users.noreply.github.com'

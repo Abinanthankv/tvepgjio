@@ -1,0 +1,414 @@
+{
+  "5StarMax": {
+    "source": "kanya",
+    "id": "5StarMax.us@East"
+  },
+  "ABC": {
+    "source": "kanya",
+    "id": "ABC.us@East"
+  },
+  "ACC Network": {
+    "source": "kanya",
+    "id": "ACCNetwork.us@SD"
+  },
+  "AMC": {
+    "source": "kanya",
+    "id": "AMC.us@East"
+  },
+  "Animal Planet": {
+    "source": "kanya",
+    "id": "AnimalPlanet.us@East"
+  },
+  "AWE": {
+    "source": "epgshare",
+    "id": "AWE.A.Wealth.of.Entertainment.HD.us2"
+  },
+  "BBC News": {
+    "source": "kanya",
+    "id": "BBCNews.uk@NorthAmerica"
+  },
+  "beIN Sports XTRA": {
+    "source": "kanya",
+    "id": "beINSPORTSXTRA.us@SD"
+  },
+  "BET": {
+    "source": "kanya",
+    "id": "BET.us@East"
+  },
+  "BET Her": {
+    "source": "kanya",
+    "id": "BETHer.us@East"
+  },
+  "Big Ten Network": {
+    "source": "kanya",
+    "id": "BigTenNetwork.us@SD"
+  },
+  "Bloomberg TV": {
+    "source": "kanya",
+    "id": "BloombergTV.us@US"
+  },
+  "Boomerang": {
+    "source": "kanya",
+    "id": "Boomerang.us@SD"
+  },
+  "Bounce": {
+    "source": "epgshare",
+    "id": "Bounce.TV.us2"
+  },
+  "Bravo": {
+    "source": "kanya",
+    "id": "Bravo.us@East"
+  },
+  "Buzzr": {
+    "source": "kanya",
+    "id": "Buzzr.us@SD"
+  },
+  "Cartoon Network": {
+    "source": "kanya",
+    "id": "CartoonNetwork.us@East"
+  },
+  "CBS": {
+    "source": "epgshare",
+    "id": "CBS.Streaming.SD.East.feed.us2"
+  },
+  "Cinemax": {
+    "source": "kanya",
+    "id": "Cinemax.us@East"
+  },
+  "CMT": {
+    "source": "kanya",
+    "id": "CMT.us@East"
+  },
+  "CNBC": {
+    "source": "kanya",
+    "id": "CNBC.us@SD"
+  },
+  "CNN": {
+    "source": "kanya",
+    "id": "CNN.us@SD"
+  },
+  "Comedy TV": {
+    "source": "epgshare",
+    "id": "Comedy.TV.HD.us2"
+  },
+  "Court TV": {
+    "source": "kanya",
+    "id": "CourtTV.us@SD"
+  },
+  "Crime + Investigation": {
+    "source": "kanya",
+    "id": "CrimePlusInvestigation.us@SD"
+  },
+  "Destination America": {
+    "source": "kanya",
+    "id": "DestinationAmerica.us@SD"
+  },
+  "Discovery Channel": {
+    "source": "kanya",
+    "id": "DiscoveryChannel.us@East"
+  },
+  "Disney Channel": {
+    "source": "kanya",
+    "id": "DisneyChannel.us@East"
+  },
+  "Disney Jr": {
+    "source": "kanya",
+    "id": "DisneyJunior.us@East"
+  },
+  "Disney XD": {
+    "source": "kanya",
+    "id": "DisneyXD.us@East"
+  },
+  "E! Entertainment Television": {
+    "source": "kanya",
+    "id": "E.us@East"
+  },
+  "ESPN": {
+    "source": "kanya",
+    "id": "ESPN.us@SD"
+  },
+  "ESPN 2": {
+    "source": "epgshare",
+    "id": "ESPN2.HD.us2"
+  },
+  "EstrellaTV": {
+    "source": "kanya",
+    "id": "EstrellaTV.us@SD"
+  },
+  "Food Network": {
+    "source": "kanya",
+    "id": "FoodNetwork.us@East"
+  },
+  "Fox": {
+    "source": "kanya",
+    "id": "Fox.us@East"
+  },
+  "Fox Deportes": {
+    "source": "epgshare",
+    "id": "Fox.Deportes.HD.us2"
+  },
+  "Fox News": {
+    "source": "kanya",
+    "id": "FoxNewsChannel.us@SD"
+  },
+  "Fox Sports": {
+    "source": "epgshare",
+    "id": "FS1.Fox.Sports.1.HD.us2"
+  },
+  "Fox Weather": {
+    "source": "kanya",
+    "id": "FoxWeather.us@SD"
+  },
+  "Game Show Network": {
+    "source": "kanya",
+    "id": "GameShowNetwork.us@East"
+  },
+  "Gol TV": {
+    "source": "epgshare",
+    "id": "GOL.TV.us2"
+  },
+  "HBO": {
+    "source": "kanya",
+    "id": "HBO.us@East"
+  },
+  "HBO Family": {
+    "source": "kanya",
+    "id": "HBOFamily.us@East"
+  },
+  "HBO Signature": {
+    "source": "kanya",
+    "id": "HBOSignature.us@East"
+  },
+  "HGTV": {
+    "source": "kanya",
+    "id": "HGTV.us@East"
+  },
+  "History": {
+    "source": "kanya",
+    "id": "History.us@East"
+  },
+  "HLN": {
+    "source": "kanya",
+    "id": "HLN.us@SD"
+  },
+  "IFC": {
+    "source": "kanya",
+    "id": "IFC.us@East"
+  },
+  "Ion": {
+    "source": "kanya",
+    "id": "IONTV.us@East"
+  },
+  "Ion Mystery": {
+    "source": "kanya",
+    "id": "62b45f15b4508e0eedacdf26"
+  },
+  "Lifetime": {
+    "source": "kanya",
+    "id": "Lifetime.us@East"
+  },
+  "MLB Network": {
+    "source": "kanya",
+    "id": "MLBNetwork.us@SD"
+  },
+  "MoreMax": {
+    "source": "kanya",
+    "id": "MoreMax.us@East"
+  },
+  "MSG": {
+    "source": "epgshare",
+    "id": "MSG.Zone.1.us2"
+  },
+  "MTV": {
+    "source": "kanya",
+    "id": "MTV.us@East"
+  },
+  "MTV Classic": {
+    "source": "epgshare",
+    "id": "MTV.Classic.us2"
+  },
+  "MTV2": {
+    "source": "kanya",
+    "id": "MTV2.us@East"
+  },
+  "National Geographic": {
+    "source": "kanya",
+    "id": "NationalGeographic.us@East"
+  },
+  "National Geographic Wild": {
+    "source": "kanya",
+    "id": "NationalGeographicWild.us@East"
+  },
+  "NBA TV": {
+    "source": "kanya",
+    "id": "NBATV.us@SD"
+  },
+  "NBC": {
+    "source": "epgshare",
+    "id": "NBC.East.Stream.us2"
+  },
+  "NBC Sports Bay Area": {
+    "source": "epgshare",
+    "id": "NBC.Sports.Bay.Area.HD.us2"
+  },
+  "Newsmax": {
+    "source": "epgshare",
+    "id": "Newsmax.TV.HD.us2"
+  },
+  "NFL Network": {
+    "source": "kanya",
+    "id": "NFLNetwork.us@SD"
+  },
+  "NHL Network": {
+    "source": "kanya",
+    "id": "NHLNetwork.us@SD"
+  },
+  "Nick Jr": {
+    "source": "kanya",
+    "id": "NickJr.us@East"
+  },
+  "Nick Music": {
+    "source": "epgshare",
+    "id": "Nick.Music.us2"
+  },
+  "Nickelodeon": {
+    "source": "kanya",
+    "id": "Nickelodeon.us@East"
+  },
+  "Nicktoons": {
+    "source": "kanya",
+    "id": "Nicktoons.us@East"
+  },
+  "Outdoor Channel": {
+    "source": "kanya",
+    "id": "OutdoorChannel.us@SD"
+  },
+  "Oxygen True Crime": {
+    "source": "kanya",
+    "id": "Oxygen.us@East"
+  },
+  "Paramount Network": {
+    "source": "kanya",
+    "id": "ParamountNetwork.us@East"
+  },
+  "PBS": {
+    "source": "kanya",
+    "id": "PBS.us@East"
+  },
+  "PBS Kids": {
+    "source": "epgshare",
+    "id": "PBS.KIDS.HD.us2"
+  },
+  "Pursuit": {
+    "source": "epgshare",
+    "id": "Pursuit.Channel.us2"
+  },
+  "QVC": {
+    "source": "kanya",
+    "id": "QVC.us@SD"
+  },
+  "Racer Network": {
+    "source": "epgshare",
+    "id": "RACER.Network.HD.us2"
+  },
+  "Reelz": {
+    "source": "kanya",
+    "id": "Reelz.us@SD"
+  },
+  "Revolt": {
+    "source": "epgshare",
+    "id": "Revolt.HD.us2"
+  },
+  "SEC Network": {
+    "source": "kanya",
+    "id": "SECNetwork.us@SD"
+  },
+  "Showtime": {
+    "source": "epgshare",
+    "id": "Paramount+.with.Showtime.HD.us2"
+  },
+  "Smithsonian Channel": {
+    "source": "kanya",
+    "id": "SmithsonianChannel.us@East"
+  },
+  "Starz Comedy": {
+    "source": "kanya",
+    "id": "StarzComedy.us@East"
+  },
+  "Sundance TV": {
+    "source": "kanya",
+    "id": "SundanceTV.us@East"
+  },
+  "SYFY": {
+    "source": "kanya",
+    "id": "Syfy.us@East"
+  },
+  "TBS": {
+    "source": "kanya",
+    "id": "TBS.us@East"
+  },
+  "TCM": {
+    "source": "kanya",
+    "id": "TCM.us@East"
+  },
+  "TeenNick": {
+    "source": "kanya",
+    "id": "TeenNick.us@East"
+  },
+  "Telemundo": {
+    "source": "kanya",
+    "id": "Telemundo.us@East"
+  },
+  "Tennis Channel": {
+    "source": "epgshare",
+    "id": "Tennis.Channel.HD.us2"
+  },
+  "TLC": {
+    "source": "kanya",
+    "id": "TLC.us@East"
+  },
+  "TNT": {
+    "source": "kanya",
+    "id": "TNT.us@East"
+  },
+  "Travel Channel": {
+    "source": "kanya",
+    "id": "TravelChannel.us@East"
+  },
+  "TruTV": {
+    "source": "kanya",
+    "id": "truTV.us@East"
+  },
+  "TV Land": {
+    "source": "kanya",
+    "id": "TVLand.us@East"
+  },
+  "TV One": {
+    "source": "epgshare",
+    "id": "TV.ONE.HD.us2"
+  },
+  "Univision": {
+    "source": "kanya",
+    "id": "Univision.us@East"
+  },
+  "USA Network": {
+    "source": "kanya",
+    "id": "USANetwork.us@East"
+  },
+  "VH1": {
+    "source": "kanya",
+    "id": "VH1.us@East"
+  },
+  "Vice TV": {
+    "source": "kanya",
+    "id": "VICETV.us@SD"
+  },
+  "We TV": {
+    "source": "kanya",
+    "id": "WeTV.us@East"
+  },
+  "YES Network": {
+    "source": "epgshare",
+    "id": "Yes.Network.us2"
+  }
+}
