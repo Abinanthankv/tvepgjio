@@ -8,6 +8,21 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'generate_epg.py'
+      - 'epg_matcher.py'
+      - 'channel_aliases.json'
+      - 'generate_playlist.py'
+      - 'epg.xml'
+      - 'epg.xml.gz'
+      - 'in_jio.m3u'
+      - 'epg_match_report.csv'
+      - '.github/workflows/generate-epg.yml'
+
+# The USA workflow shares this group so the two auto-commits never race.
+concurrency:
+  group: automated-content-update
+  cancel-in-progress: false
 
 jobs:
   build-epg-and-playlist:
@@ -18,6 +33,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -33,9 +50,15 @@ jobs:
           python generate_playlist.py
 
       - name: Commit and push updated EPG & Playlist files
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Automated EPG & Playlist Update [skip ci]"
-          file_pattern: 'epg.xml.gz epg.xml in_jio.m3u epg_match_report.csv'
-          commit_user_name: 'github-actions[bot]'
-          commit_user_email: 'github-actions[bot]@users.noreply.github.com'
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add epg.xml.gz epg.xml in_jio.m3u epg_match_report.csv
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit."
+            exit 0
+          fi
+          git commit -m "Automated EPG & Playlist Update [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main
