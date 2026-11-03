@@ -36,6 +36,6 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Automated EPG & Playlist Update [skip ci]"
-          file_pattern: 'epg.xml.gz epg.xml in_jio.m3u'
+          file_pattern: 'epg.xml.gz epg.xml in_jio.m3u epg_match_report.csv'
           commit_user_name: 'github-actions[bot]'
           commit_user_email: 'github-actions[bot]@users.noreply.github.com'

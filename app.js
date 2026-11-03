@@ -11,11 +11,43 @@ let filteredChannels = [];
 let currentTab = 'url';
 let currentViewMode = 'grid';
 
+// Matching configuration (mirrors epg_matcher.py)
+const QUALITY_TOKENS = new Set(['hd', 'sd', 'fhd', 'uhd', '4k', '8k', 'hdr', 'hevc', 'x264', 'x265', '1080p', '720p', '576p', '540p', '504p', '480p', '396p', '360p']);
+const FORMAT_TOKENS = new Set(['stb', 'mobile', 'ott']);
+const LOOSE_STOPWORDS = new Set(['tv', 'channel', 'network', 'the', 'and']);
+const LANGUAGE_TOKENS = new Set(['tamil', 'telugu', 'hindi', 'kannada', 'malayalam', 'marathi', 'bengali', 'bangla', 'punjabi', 'gujarati', 'odia', 'odiya', 'urdu', 'bhojpuri', 'assamese', 'english', 'sanskrit', 'konkani', 'kashmiri', 'nepali', 'india', 'indian', 'asia', 'usa', 'america', 'uk', 'canada', 'australia', 'arabia', 'global', 'world']);
+const DISTINCTIVE_TOKENS = new Set(['jr', 'junior', 'kids', 'news', 'movies', 'movie', 'music', 'sports', 'gold', 'plus', 'max', 'prime', 'action', 'classic', 'classics', 'comedy', 'crime', 'history', 'wild', 'life', 'live', 'shopping', 'yoga', 'bhakti', 'devotional', 'regional', 'national', 'international', '24x7']);
+const FUZZY_MIN_SCORE = 0.86;
+const FUZZY_MIN_MARGIN = 0.05;
+
+let channelAliases = new Map(); // normalised playlist key -> official source name
+
 // Initialize events when DOM loaded
 document.addEventListener('DOMContentLoaded', () => {
   setupFileInputs();
   setupFilterEvents();
+  loadChannelAliases();
 });
+
+// Load curated aliases so the browser matcher agrees with the Python matcher.
+async function loadChannelAliases() {
+  try {
+    const res = await fetch('channel_aliases.json', { cache: 'no-store' });
+    if (!res.ok) return;
+    const data = await res.json();
+    const aliases = data && data.aliases ? data.aliases : data;
+    channelAliases = new Map();
+    for (const [key, value] of Object.entries(aliases || {})) {
+      if (typeof value === 'string' && !key.startsWith('_')) {
+        channelAliases.set(normalizeName(key), value);
+      }
+    }
+    console.log(`Loaded ${channelAliases.size} channel aliases.`);
+  } catch (err) {
+    console.warn('Could not load channel_aliases.json; continuing without aliases.', err);
+  }
+}
+
 
 // Tab Switcher
 function switchTab(tab) {
@@ -114,6 +146,9 @@ async function loadData() {
     console.log(`Parsed ${epgChannels.size} EPG channels and ${epgProgrammes.size} schedule queues.`);
 
     // Step 3: Perform Matching
+    if (channelAliases.size === 0) {
+      await loadChannelAliases();
+    }
     performMatching();
 
     // Step 4: Render UI
@@ -152,6 +187,22 @@ function decompressIfNeeded(arrayBuffer) {
   return new TextDecoder("utf-8").decode(bytes);
 }
 
+// Title is everything after the last comma that is outside double quotes.
+// Some playlists embed a user-agent attribute containing commas.
+function splitExtinfTitle(line) {
+  let inQuotes = false;
+  let cut = -1;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      inQuotes = !inQuotes;
+    } else if (ch === ',' && !inQuotes) {
+      cut = i;
+    }
+  }
+  return cut !== -1 ? line.substring(cut + 1).trim() : "";
+}
+
 // M3U Playlist Parser
 function parseM3U(content) {
   const channels = [];
@@ -168,8 +219,7 @@ function parseM3U(content) {
       const tvgLogoMatch = extinf.match(/tvg-logo="([^"]*)"/);
       const groupMatch = extinf.match(/group-title="([^"]*)"/);
 
-      const commaIdx = extinf.lastIndexOf(',');
-      const title = commaIdx !== -1 ? extinf.substring(commaIdx + 1).trim() : "";
+      const title = splitExtinfTitle(extinf);
 
       let streamUrl = "";
       if (i + 1 < lines.length && !lines[i + 1].trim().startsWith('#')) {
@@ -177,13 +227,12 @@ function parseM3U(content) {
         i++;
       }
 
-      channels.append = undefined; // safety
       channels.push({
         tvg_id: tvgIdMatch ? tvgIdMatch[1] : "",
         tvg_name: tvgNameMatch ? tvgNameMatch[1] : "",
         tvg_logo: tvgLogoMatch ? tvgLogoMatch[1] : "",
         group_title: groupMatch ? groupMatch[1] : "Uncategorized",
-        title: title || "Untitled Channel",
+        title: title || (tvgNameMatch ? tvgNameMatch[1] : "Untitled Channel"),
         url: streamUrl
       });
     }
@@ -265,62 +314,302 @@ function parseXMLTVDate(dStr) {
   return new Date(Date.UTC(year, month, day, hour, minute, second));
 }
 
-// Normalize strings for matching
-function cleanStr(s) {
-  if (!s) return "";
-  s = s.replace(/\([^)]*\)/g, '');
-  s = s.replace(/\[[^\]]*\]/g, '');
-  s = s.replace(/\b(hd|sd|fhd|4k|1080p|720p|576p|480p|360p)\b/gi, '');
-  return s.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+// ---------------------------------------------------------------------------
+// Channel matching (mirrors epg_matcher.py)
+// ---------------------------------------------------------------------------
+function rawTokens(name) {
+  if (!name) return [];
+  let text = name.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+  text = text.toLowerCase().replace(/&/g, ' and ');
+  text = text.replace(/[\(\[\{][^\)\]\}]*[\)\]\}]/g, ' ');
+  return text.match(/[a-z0-9]+/g) || [];
+}
+
+function identityTokens(name) {
+  let tokens = rawTokens(name).filter(t => !QUALITY_TOKENS.has(t) && !FORMAT_TOKENS.has(t));
+  if (tokens.length && tokens[0] === 'the') tokens = tokens.slice(1);
+  return tokens;
+}
+
+function normalizeName(name, loose = false) {
+  let tokens = identityTokens(name);
+  if (loose) tokens = tokens.filter(t => !LOOSE_STOPWORDS.has(t));
+  return tokens.join('');
+}
+
+function digitsOf(name) {
+  return new Set((normalizeName(name).match(/\d+/g) || []));
+}
+
+function languageTokens(name) {
+  return new Set(identityTokens(name).filter(t => LANGUAGE_TOKENS.has(t)));
+}
+
+function tokenSet(name) {
+  return new Set(identityTokens(name).filter(t => !LOOSE_STOPWORDS.has(t)));
+}
+
+function firstToken(name) {
+  for (const token of identityTokens(name)) {
+    if (!LOOSE_STOPWORDS.has(token) && !QUALITY_TOKENS.has(token)) return token;
+  }
+  return '';
+}
+
+function variantOf(name) {
+  const tokens = new Set(rawTokens(name));
+  if (['hd', 'fhd', 'uhd', '4k', 'hdr'].some(t => tokens.has(t))) return 'hd';
+  if (tokens.has('sd')) return 'sd';
+  return '';
+}
+
+function queryVariant(tvgId, title) {
+  if (tvgId && tvgId.includes('@')) {
+    const suffix = tvgId.split('@').pop().trim().toLowerCase();
+    if (['hd', 'fhd', 'uhd', '4k'].includes(suffix)) return 'hd';
+    if (suffix === 'sd') return 'sd';
+  }
+  return variantOf(title);
+}
+
+// Longest-common-subsequence ratio, equivalent in spirit to Python difflib.
+function sequenceRatio(a, b) {
+  if (!a && !b) return 1;
+  if (!a || !b) return 0;
+  const dp = new Array(b.length + 1).fill(0);
+  for (let i = 1; i <= a.length; i++) {
+    let previous = 0;
+    for (let j = 1; j <= b.length; j++) {
+      const temp = dp[j];
+      dp[j] = a[i - 1] === b[j - 1] ? previous + 1 : Math.max(dp[j], dp[j - 1]);
+      previous = temp;
+    }
+  }
+  return (2 * dp[b.length]) / (a.length + b.length);
+}
+
+function sameSet(a, b) {
+  if (a.size !== b.size) return false;
+  for (const value of a) if (!b.has(value)) return false;
+  return true;
+}
+
+function intersect(a, b) {
+  const result = new Set();
+  for (const value of a) if (b.has(value)) result.add(value);
+  return result;
+}
+
+function tokensCover(left, right, threshold = 0.8) {
+  if (!left.size || !right.size) return false;
+  for (const token of new Set([...left, ...right])) {
+    const other = left.has(token) ? right : left;
+    let covered = false;
+    for (const candidate of other) {
+      if (token === candidate || sequenceRatio(token, candidate) >= threshold) {
+        covered = true;
+        break;
+      }
+    }
+    if (!covered) return false;
+  }
+  return true;
+}
+
+function chooseByVariant(ids, queryVar, sourceVariants) {
+  if (ids.length === 1) return { id: ids[0], candidates: [] };
+  const ranked = ids.map(id => {
+    const sourceVar = sourceVariants.get(id) || '';
+    let rank;
+    if (queryVar && sourceVar === queryVar) rank = 0;
+    else if (!sourceVar) rank = 1;
+    else if (!queryVar) rank = 2;
+    else rank = 3;
+    return { rank, id };
+  }).sort((a, b) => a.rank - b.rank);
+  const bestRank = ranked[0].rank;
+  const best = ranked.filter(item => item.rank === bestRank).map(item => item.id);
+  if (best.length === 1) return { id: best[0], candidates: [] };
+  return { id: null, candidates: ids };
+}
+
+function fuzzyScore(qTokens, qNorm, qDigits, qLangs, qFirst, candidateName) {
+  const cTokens = tokenSet(candidateName);
+  const cNorm = normalizeName(candidateName);
+  if (!cTokens.size || !cNorm) return 0;
+
+  // Numeric identity must match (Dangal != Dangal 2).
+  if (!sameSet(digitsOf(candidateName), qDigits)) return 0;
+
+  // Language/region markers must not conflict.
+  const cLangs = languageTokens(candidateName);
+  if (qLangs.size && cLangs.size && !sameSet(qLangs, cLangs)) return 0;
+
+  // Sibling-channel words must agree (Nickelodeon != Nickelodeon Jr.).
+  if (!sameSet(intersect(qTokens, DISTINCTIVE_TOKENS), intersect(cTokens, DISTINCTIVE_TOKENS))) return 0;
+
+  // First meaningful word must agree (NTV Telugu != TV9 Telugu).
+  if (qFirst && firstToken(candidateName) !== qFirst) return 0;
+
+  // Every word must be nearly present on the other side.
+  if (!tokensCover(qTokens, cTokens)) return 0;
+
+  const intersectionSize = [...qTokens].filter(t => cTokens.has(t)).length;
+  const unionSize = new Set([...qTokens, ...cTokens]).size;
+  const jaccard = unionSize ? intersectionSize / unionSize : 0;
+  return Math.max(jaccard, sequenceRatio(qNorm, cNorm));
+}
+
+function exactFromIndex(index, key, queryVar, sourceVariants) {
+  if (!key) return null;
+  const ids = index.get(key);
+  if (!ids || ids.size === 0) return null;
+  const chosen = chooseByVariant([...ids], queryVar, sourceVariants);
+  if (chosen.id) {
+    return { status: 'exact', epgId: chosen.id, method: 'exact-name', score: 1 };
+  }
+  return { status: 'ambiguous', epgId: null, method: 'exact-name', score: 1, candidates: chosen.candidates };
+}
+
+function resolveAlias(target, strictIndex, looseIndex) {
+  if (epgChannels.has(target)) return target;
+  for (const index of [strictIndex, looseIndex]) {
+    for (const key of [normalizeName(target), normalizeName(target, true)]) {
+      const ids = index.get(key);
+      if (ids && ids.size === 1) return [...ids][0];
+    }
+  }
+  return null;
+}
+
+function fuzzyMatchChannel(query) {
+  const qTokens = tokenSet(query);
+  const qNorm = normalizeName(query);
+  if (!qTokens.size || qNorm.length < 4) {
+    return { status: 'unmatched', epgId: null, method: 'fuzzy', score: 0 };
+  }
+
+  const qDigits = digitsOf(query);
+  const qLangs = languageTokens(query);
+  const qFirst = firstToken(query);
+  const scored = [];
+
+  for (const [id, names] of epgChannels.entries()) {
+    let best = 0;
+    for (const name of (names.length ? names : [id])) {
+      // Cheap pre-filter: the first meaningful word is a hard guard in
+      // fuzzyScore, so skip candidates that cannot pass it.
+      if (qFirst && firstToken(name) !== qFirst) continue;
+      best = Math.max(best, fuzzyScore(qTokens, qNorm, qDigits, qLangs, qFirst, name));
+    }
+    if (best > 0) scored.push({ score: best, id });
+  }
+
+  if (!scored.length) {
+    return { status: 'unmatched', epgId: null, method: 'fuzzy', score: 0 };
+  }
+
+  scored.sort((a, b) => b.score - a.score);
+  const top = scored[0];
+  const runnerUp = scored[1] ? scored[1].score : 0;
+
+  if (top.score < FUZZY_MIN_SCORE) {
+    return { status: 'unmatched', epgId: null, method: 'fuzzy', score: top.score };
+  }
+  if (runnerUp && top.score - runnerUp < FUZZY_MIN_MARGIN) {
+    return {
+      status: 'ambiguous',
+      epgId: null,
+      method: 'fuzzy',
+      score: top.score,
+      candidates: scored.slice(0, 3).map(item => item.id)
+    };
+  }
+  return { status: 'fuzzy', epgId: top.id, method: 'fuzzy', score: top.score };
+}
+
+function matchChannel(ch, strictIndex, looseIndex, sourceVariants) {
+  const tvgId = ch.tvg_id || '';
+  const baseIdFull = tvgId.split('@')[0];
+  const baseId = baseIdFull.includes('.') ? baseIdFull.split('.')[0] : baseIdFull;
+  const queryVar = queryVariant(tvgId, ch.title || ch.tvg_name);
+
+  // 1. Exact source id.
+  if (tvgId && epgChannels.has(tvgId)) {
+    return { status: 'exact', epgId: tvgId, method: 'source-id', score: 1 };
+  }
+  if (baseId && epgChannels.has(baseId)) {
+    return { status: 'exact', epgId: baseId, method: 'source-id', score: 1 };
+  }
+
+  // 2. Exact normalised name (strict, then loose).
+  const strictKeys = [normalizeName(ch.title), normalizeName(ch.tvg_name), normalizeName(baseId)];
+  for (const key of strictKeys) {
+    const result = exactFromIndex(strictIndex, key, queryVar, sourceVariants);
+    if (result) return result;
+  }
+  const looseKeys = [normalizeName(ch.title, true), normalizeName(ch.tvg_name, true), normalizeName(baseId, true)];
+  for (const key of looseKeys) {
+    const result = exactFromIndex(looseIndex, key, queryVar, sourceVariants);
+    if (result) {
+      if (result.status === 'exact') result.method = 'exact-name-loose';
+      return result;
+    }
+  }
+
+  // 3. Curated alias.
+  for (const key of strictKeys) {
+    const target = channelAliases.get(key);
+    if (!target) continue;
+    const resolved = resolveAlias(target, strictIndex, looseIndex);
+    if (resolved) return { status: 'alias', epgId: resolved, method: 'alias', score: 1 };
+  }
+
+  // 4. Guarded fuzzy.
+  return fuzzyMatchChannel(ch.title || ch.tvg_name || baseId);
 }
 
 // Perform Channel Matching
 function performMatching() {
   matchedChannels = [];
 
-  // Build lookup index for EPG channels
-  const epgLookup = new Map();
-  for (let [id, names] of epgChannels.entries()) {
-    const cleanId = cleanStr(id.split('.')[0]);
-    if (cleanId) epgLookup.set(cleanId, id);
-    for (let name of names) {
-      const cleanName = cleanStr(name);
-      if (cleanName && !epgLookup.has(cleanName)) {
-        epgLookup.set(cleanName, id);
-      }
+  // Build lookup indexes for EPG channels. Values are Sets so collisions
+  // stay visible and can be resolved by feed variant or reported ambiguous.
+  const strictIndex = new Map();
+  const looseIndex = new Map();
+  const sourceVariants = new Map();
+
+  const addKey = (index, key, id) => {
+    if (!key) return;
+    if (!index.has(key)) index.set(key, new Set());
+    index.get(key).add(id);
+  };
+
+  for (const [id, names] of epgChannels.entries()) {
+    const primary = names.length ? names[0] : id;
+    sourceVariants.set(id, variantOf(primary));
+    addKey(strictIndex, normalizeName(id), id);
+    for (const name of names) {
+      addKey(strictIndex, normalizeName(name), id);
+      addKey(looseIndex, normalizeName(name, true), id);
     }
   }
 
   const now = new Date();
 
-  for (let ch of m3uChannels) {
-    const tvgId = ch.tvg_id;
-    const baseId = tvgId ? tvgId.split('@')[0] : "";
-    const cleanBaseId = cleanStr(baseId.split('.')[0]);
-    const cleanTitle = cleanStr(ch.title);
-    const cleanName = cleanStr(ch.tvg_name);
-
-    let matchedEpgId = null;
-
-    if (tvgId && epgChannels.has(tvgId)) {
-      matchedEpgId = tvgId;
-    } else if (baseId && epgChannels.has(baseId)) {
-      matchedEpgId = baseId;
-    } else if (cleanBaseId && epgLookup.has(cleanBaseId)) {
-      matchedEpgId = epgLookup.get(cleanBaseId);
-    } else if (cleanTitle && epgLookup.has(cleanTitle)) {
-      matchedEpgId = epgLookup.get(cleanTitle);
-    } else if (cleanName && epgLookup.has(cleanName)) {
-      matchedEpgId = epgLookup.get(cleanName);
-    }
-
+  for (const ch of m3uChannels) {
+    const result = matchChannel(ch, strictIndex, looseIndex, sourceVariants);
+    const matchedEpgId = result.epgId;
     const progs = matchedEpgId ? (epgProgrammes.get(matchedEpgId) || []) : [];
-    
+    const sourceName = matchedEpgId && epgChannels.has(matchedEpgId)
+      ? epgChannels.get(matchedEpgId)[0]
+      : '';
+
     // Find current live program and upcoming
     let currentProg = null;
-    let upcomingProgs = [];
+    const upcomingProgs = [];
 
-    for (let p of progs) {
+    for (const p of progs) {
       if (now >= p.start && now <= p.stop) {
         currentProg = p;
       } else if (p.start > now) {
@@ -332,6 +621,11 @@ function performMatching() {
       ...ch,
       epg_id: matchedEpgId,
       has_epg: matchedEpgId !== null && progs.length > 0,
+      match_status: result.status,
+      match_method: result.method,
+      match_score: result.score,
+      match_candidates: result.candidates || [],
+      source_name: sourceName,
       current_prog: currentProg,
       upcoming_progs: upcomingProgs.slice(0, 3),
       total_progs: progs.length
@@ -392,6 +686,7 @@ function applyFilters() {
     // Search match
     const matchSearch = !searchVal || 
       ch.title.toLowerCase().includes(searchVal) || 
+      (ch.source_name || '').toLowerCase().includes(searchVal) ||
       ch.tvg_id.toLowerCase().includes(searchVal) ||
       (ch.current_prog && ch.current_prog.title.toLowerCase().includes(searchVal));
 
@@ -399,9 +694,11 @@ function applyFilters() {
     const matchGroup = groupVal === "ALL" || ch.group_title === groupVal;
 
     // EPG Status match
-    const matchStatus = statusVal === "ALL" || 
-      (statusVal === "MATCHED" && ch.has_epg) || 
-      (statusVal === "UNMATCHED" && !ch.has_epg);
+    let matchStatus = true;
+    if (statusVal === "MATCHED") matchStatus = ch.has_epg;
+    else if (statusVal === "UNMATCHED") matchStatus = !ch.has_epg;
+    else if (statusVal === "FUZZY") matchStatus = ch.match_status === "fuzzy";
+    else if (statusVal === "REVIEW") matchStatus = ch.match_status === "ambiguous";
 
     return matchSearch && matchGroup && matchStatus;
   });
@@ -437,12 +734,29 @@ function renderChannels() {
   let html = `<div class="${gridClass}">`;
 
   for (let ch of filteredChannels) {
-    const statusBadge = ch.has_epg 
-      ? `<span class="badge-status matched"><i class="fa-solid fa-check"></i> EPG (${ch.total_progs})</span>`
-      : `<span class="badge-status unmatched"><i class="fa-solid fa-xmark"></i> No EPG</span>`;
+    // Prefer the official source name in the guide; keep the playlist name
+    // visible underneath so the mapping is always auditable.
+    const displayTitle = ch.source_name || ch.title;
+    const showPlaylistName = ch.source_name && ch.source_name !== ch.title;
+
+    let statusBadge;
+    if (ch.has_epg) {
+      statusBadge = `<span class="badge-status matched"><i class="fa-solid fa-check"></i> EPG (${ch.total_progs})</span>`;
+    } else if (ch.match_status === 'ambiguous') {
+      statusBadge = `<span class="badge-status unmatched" title="Multiple source channels are equally plausible"><i class="fa-solid fa-code-branch"></i> Review</span>`;
+    } else {
+      statusBadge = `<span class="badge-status unmatched"><i class="fa-solid fa-xmark"></i> No EPG</span>`;
+    }
+
+    let methodBadge = '';
+    if (ch.match_status === 'fuzzy') {
+      methodBadge = `<span class="match-badge fuzzy" title="Guarded fuzzy match, score ${ch.match_score.toFixed(2)}">fuzzy ${ch.match_score.toFixed(2)}</span>`;
+    } else if (ch.match_status === 'alias') {
+      methodBadge = `<span class="match-badge alias" title="Matched using channel_aliases.json">alias</span>`;
+    }
 
     const logoHtml = ch.tvg_logo 
-      ? `<img src="${ch.tvg_logo}" alt="${ch.title}" class="channel-logo" onerror="this.src='https://via.placeholder.com/48/131b2e/06b6d4?text=TV'">`
+      ? `<img src="${ch.tvg_logo}" alt="${escapeHtml(displayTitle)}" class="channel-logo" onerror="this.src='https://via.placeholder.com/48/131b2e/06b6d4?text=TV'">`
       : `<i class="fa-solid fa-tv" style="color: var(--accent-cyan); font-size: 1.2rem;"></i>`;
 
     // Now Playing section
@@ -489,7 +803,8 @@ function renderChannels() {
         <div class="channel-header">
           <div class="channel-logo-container">${logoHtml}</div>
           <div class="channel-info">
-            <div class="channel-title" title="${escapeHtml(ch.title)}">${escapeHtml(ch.title)}</div>
+            <div class="channel-title" title="${escapeHtml(displayTitle)}">${escapeHtml(displayTitle)} ${methodBadge}</div>
+            ${showPlaylistName ? `<div class="channel-subtitle" title="Playlist name">${escapeHtml(ch.title)}</div>` : ''}
             <div class="channel-meta">
               <span class="tvg-id-badge">${escapeHtml(ch.tvg_id || 'N/A')}</span>
               <span>•</span>
@@ -530,6 +845,10 @@ function openChannelModal(idOrTitle) {
 
   const modalBody = document.getElementById('modalBody');
   const progs = ch.epg_id ? (epgProgrammes.get(ch.epg_id) || []) : [];
+  const displayTitle = ch.source_name || ch.title;
+  const matchDetail = ch.match_status
+    ? `${ch.match_status}${ch.match_method ? ' / ' + ch.match_method : ''}${ch.match_status === 'fuzzy' ? ' (' + ch.match_score.toFixed(2) + ')' : ''}`
+    : 'unknown';
 
   let scheduleListHtml = '';
   if (progs.length > 0) {
@@ -553,10 +872,12 @@ function openChannelModal(idOrTitle) {
         ${ch.tvg_logo ? `<img src="${ch.tvg_logo}" class="channel-logo">` : `<i class="fa-solid fa-tv" style="font-size:1.5rem; color:var(--accent-cyan)"></i>`}
       </div>
       <div>
-        <h2 style="font-size:1.4rem;">${escapeHtml(ch.title)}</h2>
+        <h2 style="font-size:1.4rem;">${escapeHtml(displayTitle)}</h2>
+        ${ch.source_name && ch.source_name !== ch.title ? `<p style="color: var(--text-muted); font-size:0.85rem; margin-bottom:0.2rem;">Playlist name: ${escapeHtml(ch.title)}</p>` : ''}
         <p style="color: var(--text-secondary); font-size:0.85rem;">
           tvg-id: <code>${escapeHtml(ch.tvg_id || 'None')}</code> | Category: ${escapeHtml(ch.group_title)}
         </p>
+        <p style="color: var(--text-muted); font-size:0.78rem; margin-top:0.2rem;">Match: ${escapeHtml(matchDetail)}</p>
       </div>
     </div>
     <h3 style="font-size:1.1rem; margin-bottom:1rem; color:var(--text-primary);">

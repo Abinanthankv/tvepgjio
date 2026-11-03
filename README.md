@@ -37,9 +37,55 @@ https://raw.githubusercontent.com/Abinanthankv/tvepgjio/main/usa_tv_next.m3u
 
 ## ⚡ Features & Workflows
 
-* **All-in-One Integrated Playlist (`in_jio.m3u`)**: Contains 835+ Indian live streams with embedded `url-tvg` pointing to your Jio EPG guide.
-* **Jio EPG Workflow** (`generate-epg.yml`): Maps 580+ Indian channels from `in.m3u` to Jio schedules. Runs **every 6 hours** automatically (`cron: '0 */6 * * *'`).
+* **All-in-One Integrated Playlist (`in_jio.m3u`)**: Contains 840+ Indian live streams with embedded `url-tvg` pointing to your Jio EPG guide. Channel names, logos, groups and per-channel options are copied exactly from the upstream playlist.
+* **Jio EPG Workflow** (`generate-epg.yml`): Maps Indian channels from `in.m3u` to Jio schedules. Runs **every 6 hours** automatically (`cron: '0 */6 * * *'`).
 * **USA TV Next M3U Workflow** (`update-usa-m3u.yml`): Converts 169+ US live streams from `usa-tv-next` into `#EXTM3U`. Runs **once daily** (`cron: '0 0 * * *'`).
+
+---
+
+## 🎯 EPG Matching & Channel Names
+
+The guide uses the **official Jio source channel name** for every matched
+`<display-name>` (for example `Colors Cineplex Superhit`, not
+`Colors Cineplex Superhits (576p)`). The playlist name is preserved as the
+secondary, human-readable label in the web app so every mapping stays
+auditable.
+
+Matching is staged and deliberately conservative:
+
+1. **Exact source ID** — direct `tvg-id` match.
+2. **Exact normalised name** — case, punctuation, brackets, `HD`/`SD` and
+   quality tags are ignored; `@HD`/`@SD` tvg-id tags disambiguate duplicate
+   SD/HD source feeds.
+3. **Curated alias** — see [`channel_aliases.json`](channel_aliases.json).
+4. **Guarded fuzzy match** — only when the first word, numbers, language
+   markers and distinctive words agree. Weak candidates are reported as
+   `ambiguous` instead of being guessed.
+
+`generate_epg.py` writes **`epg_match_report.csv`** with one row per playlist
+channel (`status`, `method`, `score`, `source_id`, `source_name`,
+`programme_count`, `candidates`). To fix a missing channel:
+
+1. Open `epg_match_report.csv` and find the `unmatched` row.
+2. Add an entry to `channel_aliases.json`:
+   ```json
+   {
+     "aliases": {
+       "Playlist Channel Name": "Official Jio Source Name"
+     }
+   }
+   ```
+3. Re-run `python generate_epg.py`. The alias is applied before fuzzy
+   matching, so it is deterministic.
+
+You can test locally without overwriting the published files:
+
+```bash
+python generate_epg.py \
+  --output /tmp/epg.xml \
+  --output-gz /tmp/epg.xml.gz \
+  --report /tmp/epg_match_report.csv
+```
 
 ---
 
