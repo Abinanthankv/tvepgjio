@@ -49,12 +49,14 @@ https://raw.githubusercontent.com/Abinanthankv/tvepgjio/main/usa_epg.xml.gz
 * **USA TV Next Workflow** (`update-usa-m3u.yml`): Converts the `usa-tv-next`
   catalog into a cleaned M3U, then builds a compact USA XMLTV guide. Runs
   **once daily** (`cron: '0 0 * * *'`) and commits
-  `usa_tv_next.m3u`, `usa_epg.xml.gz` and `usa_epg_report.csv`.
+  `usa_tv_next.m3u`, `usa_epg.xml`, `usa_epg.xml.gz` and
+  `usa_epg_report.csv`.
 * **Cleaned USA output**: audio-only streams, dead feeds, duplicate URLs,
   UUID titles and known non-US/junk feeds (for example the Australian
   `abc-*` feeds and the `*_in_90_seconds` clips) are removed. Every remaining
   feed gets a unique `Channel (Source - Quality)` title, stable `tvg-id`, a
-  `USA | <Genre>` group and a deterministic sort order.
+  `USA | <Genre>` group and a deterministic sort order. The upstream catalog
+  lists 169 channels; 103 currently have usable video streams.
 
 ---
 
