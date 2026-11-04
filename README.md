@@ -56,7 +56,7 @@ https://raw.githubusercontent.com/Abinanthankv/tvepgjio/main/usa_epg.xml.gz
   `abc-*` feeds and the `*_in_90_seconds` clips) are removed. Every remaining
   feed gets a unique `Channel (Source - Quality)` title, stable `tvg-id`, a
   `USA | <Genre>` group and a deterministic sort order. The upstream catalog
-  lists 169 channels; 103 currently have usable video streams.
+  lists 169 channels; 104 currently have usable video streams.
 
 ---
 
@@ -106,23 +106,36 @@ python generate_epg.py \
 
 ### USA TV Next guide
 
-The USA guide is built from two public XMLTV sources
-(`epg.kanya.io` and `epgshare01`). `usa_epg_aliases.json` records the exact
-source channel id for every playlist channel; `generate_usa_epg.py` keeps only
-those channels, rewrites their ids to match the playlist, and writes:
+The USA guide is built from three public XMLTV sources:
+
+* **epgshare01 US2** — primary guide for national cable/network channels.
+* **Kanya** — fallback for channels epgshare does not carry.
+* **i.mjh.nz Pluto TV** — used with the **native Pluto channel id** embedded in
+  each Pluto stream URL. This is the same approach used by well-known Pluto
+  playlists and keeps those feeds matched to the correct Pluto schedule.
+
+`usa_epg_aliases.json` records the exact source channel id for every curated
+playlist channel. `generate_usa_epg.py` keeps only the referenced channels,
+rewrites curated ids to match the playlist, leaves native Pluto ids untouched,
+and writes:
 
 * `usa_epg.xml` / `usa_epg.xml.gz` — compact guide used by the playlist.
-* `usa_epg_report.csv` — per-channel audit (`status`, `source`, `source_id`,
-  `programmes`). Channels without a confident mapping are marked `unmapped`
-  rather than being guessed.
+* `usa_epg_report.csv` — per-channel audit (`source`, `source_id`,
+  `programmes`, `future_programmes`, `status`). Channels without a confident
+  mapping are marked `unmapped` rather than being guessed. A `missing` status
+  means the playlist references a native Pluto id that the Pluto guide does
+  not currently carry. When such a channel has no other guide-bearing stream,
+  the curated national mapping is reused under the native id and marked
+  `fallback`; extra Pluto feeds are left `missing` instead of being silently
+  given a schedule that may belong to a different channel.
 
 To fix or add a USA channel:
 
-1. Find the source channel id in the guide (for example `ABC.us@East`).
+1. Find the source channel id in the guide (for example `ABC.National.Feed.us2`).
 2. Add it to `usa_epg_aliases.json`:
    ```json
    {
-     "ABC": { "source": "kanya", "id": "ABC.us@East" }
+     "ABC": { "source": "epgshare", "id": "ABC.National.Feed.us2" }
    }
    ```
 3. Re-run:

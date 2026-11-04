@@ -60,6 +60,20 @@ class StreamHelperTests(unittest.TestCase):
         )
         self.assertEqual(normalized, "https://example.com/live.m3u8?foo=1")
 
+    def test_pluto_id_of(self) -> None:
+        channel_id = "51c75f7bb6f26ba1cd00002f"
+        self.assertEqual(
+            converter.pluto_id_of(
+                f"https://service-stitcher.clusters.pluto.tv/x/channel/{channel_id}/master.m3u8"
+            ),
+            channel_id,
+        )
+        self.assertEqual(
+            converter.pluto_id_of("https://example.com/channel/51c75f7bb6f26ba1cd00002f/x.m3u8"),
+            "",
+        )
+        self.assertEqual(converter.pluto_id_of("https://example.com/live.m3u8"), "")
+
 
 class BuildTests(unittest.TestCase):
     def _make_repo(self, root: Path) -> Path:
@@ -78,6 +92,11 @@ class BuildTests(unittest.TestCase):
                 {"url": "https://c.mjh.nz/abc-nsw.m3u8", "name": "SD"},
                 {
                     "url": "https://service-stitcher.clusters.pluto.tv/live.m3u8",
+                    "name": "SD",
+                    "description": "HV:SERVICE-STIT",
+                },
+                {
+                    "url": "https://service-stitcher.clusters.pluto.tv/x/channel/51c75f7bb6f26ba1cd00002f/master.m3u8",
                     "name": "SD",
                     "description": "HV:SERVICE-STIT",
                 },
@@ -120,8 +139,9 @@ class BuildTests(unittest.TestCase):
             self.assertNotIn("Audio", text)
             self.assertNotIn("[DEAD]", text)
             self.assertNotIn("abc-nsw", text)
-            self.assertEqual(text.count("#EXTINF"), 4)
+            self.assertEqual(text.count("#EXTINF"), 5)
             self.assertIn('tvg-id="test-channel.us"', text)
+            self.assertIn('tvg-id="51c75f7bb6f26ba1cd00002f"', text)
             self.assertIn('tvg-name="Test Channel"', text)
             self.assertIn('group-title="USA | Local"', text)
             self.assertIn("Test Channel (Pluto TV - SD)", text)

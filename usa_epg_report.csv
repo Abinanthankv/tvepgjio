@@ -1,104 +1,140 @@
-﻿channel,tvg_id,source,source_id,programmes,status
-5StarMax,5starmax.us,kanya,5StarMax.us@East,36,ok
-ABC,abc.us,kanya,ABC.us@East,54,ok
-ACC Network,acc-network.us,kanya,ACCNetwork.us@SD,50,ok
-AMC,amc.us,kanya,AMC.us@East,44,ok
-Animal Planet,animal-planet.us,kanya,AnimalPlanet.us@East,60,ok
-AWE,awe.us,epgshare,AWE.A.Wealth.of.Entertainment.HD.us2,168,ok
-BBC News,bbc-news.us,kanya,BBCNews.uk@NorthAmerica,122,ok
-beIN Sports XTRA,bein-sports-xtra.us,kanya,beINSPORTSXTRA.us@SD,57,ok
-BET,bet.us,kanya,BET.us@East,94,ok
-BET Her,bet-her.us,kanya,BETHer.us@East,75,ok
-Big Ten Network,big-ten-network.us,kanya,BigTenNetwork.us@SD,64,ok
-Bloomberg TV,bloomberg-tv.us,kanya,BloombergTV.us@US,2,ok
-Boomerang,boomerang.us,kanya,Boomerang.us@SD,198,ok
-Bounce,bounce.us,epgshare,Bounce.TV.us2,104,ok
-Bravo,bravo.us,kanya,Bravo.us@East,61,ok
-Buzzr,buzzr.us,kanya,Buzzr.us@SD,80,ok
-Cartoon Network,cartoon-network.us,kanya,CartoonNetwork.us@East,153,ok
-CBS,cbs.us,epgshare,CBS.Streaming.SD.East.feed.us2,101,ok
-Cinemax,cinemax.us,kanya,Cinemax.us@East,36,ok
-CMT,cmt.us,kanya,CMT.us@East,93,ok
-CNBC,cnbc.us,kanya,CNBC.us@SD,54,ok
-CNN,cnn.us,kanya,CNN.us@SD,43,ok
-Comedy TV,comedy-tv.us,epgshare,Comedy.TV.HD.us2,171,ok
-Court TV,court-tv.us,kanya,CourtTV.us@SD,51,ok
-Crime + Investigation,crime-plus-investigation.us,kanya,CrimePlusInvestigation.us@SD,68,ok
-Destination America,destination-america.us,kanya,DestinationAmerica.us@SD,108,ok
-Discovery Channel,discovery-channel.us,kanya,DiscoveryChannel.us@East,59,ok
-Disney Channel,disney-channel.us,kanya,DisneyChannel.us@East,108,ok
-Disney Jr,disney-jr.us,kanya,DisneyJunior.us@East,126,ok
-Disney XD,disney-xd.us,kanya,DisneyXD.us@East,106,ok
-E! Entertainment Television,e-entertainment-television.us,kanya,E.us@East,58,ok
-ESPN,espn.us,kanya,ESPN.us@SD,52,ok
-ESPN 2,espn-2.us,epgshare,ESPN2.HD.us2,78,ok
-EstrellaTV,estrellatv.us,kanya,EstrellaTV.us@SD,31,ok
-Food Network,food-network.us,kanya,FoodNetwork.us@East,69,ok
-Fox,fox.us,kanya,Fox.us@East,26,ok
-Fox Deportes,fox-deportes.us,epgshare,Fox.Deportes.HD.us2,94,ok
-Fox News,fox-news.us,kanya,FoxNewsChannel.us@SD,47,ok
-Fox Sports,fox-sports.us,epgshare,FS1.Fox.Sports.1.HD.us2,67,ok
-Fox Weather,fox-weather.us,kanya,FoxWeather.us@SD,24,ok
-Game Show Network,game-show-network.us,kanya,GameShowNetwork.us@East,96,ok
-Gol TV,gol-tv.us,epgshare,GOL.TV.us2,72,ok
-HBO,hbo.us,kanya,HBO.us@East,57,ok
-HBO Family,hbo-family.us,kanya,HBOFamily.us@East,0,no_programmes
-HBO Signature,hbo-signature.us,kanya,HBOSignature.us@East,51,ok
-HGTV,hgtv.us,kanya,HGTV.us@East,76,ok
-History,history.us,kanya,History.us@East,66,ok
-HLN,hln.us,kanya,HLN.us@SD,102,ok
-IFC,ifc.us,kanya,IFC.us@East,108,ok
-Ion,ion.us,kanya,IONTV.us@East,48,ok
-Ion Mystery,ion-mystery.us,kanya,62b45f15b4508e0eedacdf26,48,ok
-Lifetime,lifetime.us,kanya,Lifetime.us@East,67,ok
-MLB Network,mlb-network.us,kanya,MLBNetwork.us@SD,48,ok
-MoreMax,moremax.us,kanya,MoreMax.us@East,39,ok
-MSG,msg.us,epgshare,MSG.Zone.1.us2,91,ok
-MTV,mtv.us,kanya,MTV.us@East,96,ok
-MTV Classic,mtv-classic.us,epgshare,MTV.Classic.us2,96,ok
-MTV2,mtv2.us,kanya,MTV2.us@East,85,ok
-National Geographic,national-geographic.us,kanya,NationalGeographic.us@East,67,ok
-National Geographic Wild,national-geographic-wild.us,kanya,NationalGeographicWild.us@East,68,ok
-NBA TV,nba-tv.us,kanya,NBATV.us@SD,75,ok
-NBC,nbc.us,epgshare,NBC.East.Stream.us2,116,ok
-NBC Sports Bay Area,nbc-sports-bay-area.us,epgshare,NBC.Sports.Bay.Area.HD.us2,126,ok
-Newsmax,newsmax.us,epgshare,Newsmax.TV.HD.us2,83,ok
-NFL Network,nfl-network.us,kanya,NFLNetwork.us@SD,40,ok
-NHL Network,nhl-network.us,kanya,NHLNetwork.us@SD,72,ok
-Nick Jr,nick-jr.us,kanya,NickJr.us@East,112,ok
-Nick Music,nick-music.us,epgshare,Nick.Music.us2,96,ok
-Nickelodeon,nickelodeon.us,kanya,Nickelodeon.us@East,85,ok
-Nicktoons,nicktoons.us,kanya,Nicktoons.us@East,124,ok
-Oxygen True Crime,oxygen-true-crime.us,kanya,Oxygen.us@East,64,ok
-Paramount Network,paramount-network.us,kanya,ParamountNetwork.us@East,52,ok
-PBS,pbs.us,kanya,PBS.us@East,75,ok
-PBS Kids,pbs-kids.us,epgshare,PBS.KIDS.HD.us2,189,ok
-Pursuit,pursuit.us,epgshare,Pursuit.Channel.us2,189,ok
-QVC,qvc.us,kanya,QVC.us@SD,41,ok
-Racer Network,racer-network.us,epgshare,RACER.Network.HD.us2,155,ok
-Reelz,reelz.us,kanya,Reelz.us@SD,82,ok
-Revolt,revolt.us,epgshare,Revolt.HD.us2,120,ok
-SEC Network,sec-network.us,kanya,SECNetwork.us@SD,44,ok
-Showtime,showtime.us,epgshare,Paramount+.with.Showtime.HD.us2,48,ok
-Smithsonian Channel,smithsonian-channel.us,kanya,SmithsonianChannel.us@East,60,ok
-Starz Comedy,starz-comedy.us,kanya,StarzComedy.us@East,42,ok
-Sundance TV,sundance-tv.us,kanya,SundanceTV.us@East,56,ok
-SYFY,syfy.us,kanya,Syfy.us@East,54,ok
-TBS,tbs.us,kanya,TBS.us@East,101,ok
-TCM,tcm.us,kanya,TCM.us@East,39,ok
-TeenNick,teennick.us,kanya,TeenNick.us@East,122,ok
-Telemundo,telemundo.us,kanya,Telemundo.us@East,63,ok
-Tennis Channel,tennis-channel.us,epgshare,Tennis.Channel.HD.us2,24,ok
-TLC,tlc.us,kanya,TLC.us@East,59,ok
-TNT,tnt.us,kanya,TNT.us@East,48,ok
-Toonami Aftermath (East),toonami-aftermath-east.us,,,0,unmapped
-Travel Channel,travel-channel.us,kanya,TravelChannel.us@East,59,ok
-TruTV,trutv.us,kanya,truTV.us@East,88,ok
-TV Land,tv-land.us,kanya,TVLand.us@East,94,ok
-TV One,tv-one.us,epgshare,TV.ONE.HD.us2,160,ok
-Univision,univision.us,kanya,Univision.us@East,63,ok
-USA Network,usa-network.us,kanya,USANetwork.us@East,60,ok
-VH1,vh1.us,kanya,VH1.us@East,89,ok
-Vice TV,vice-tv.us,kanya,VICETV.us@SD,2,ok
-We TV,we-tv.us,kanya,WeTV.us@East,68,ok
-YES Network,yes-network.us,epgshare,Yes.Network.us2,73,ok
+﻿channel,tvg_id,source,source_id,programmes,future_programmes,status
+5StarMax,5starmax.us,epgshare,5.StarMAX.HD.East.us2,54,30,ok
+ABC,abc.us,epgshare,ABC.National.Feed.us2,107,56,ok
+ACC Network,acc-network.us,epgshare,ACC.Network.us2,76,40,ok
+AMC,amc.us,epgshare,AMC.HD.us2,68,36,ok
+Animal Planet,animal-planet.us,epgshare,Animal.Planet.HD.us2,96,51,ok
+AWE,awe.us,epgshare,AWE.A.Wealth.of.Entertainment.HD.us2,168,90,ok
+BBC News,bbc-news.us,epgshare,BBC.News.(North.America).HD.us2,230,122,ok
+BBC News,65d92a8c8b24c80008e285c0,pluto,65d92a8c8b24c80008e285c0,28,26,ok
+beIN Sports XTRA,bein-sports-xtra.us,kanya,beINSPORTSXTRA.us@SD,49,22,ok
+BET,bet.us,epgshare,BET.HD.us2,160,84,ok
+BET,5ca670f6593a5d78f0e85aed,pluto,5ca670f6593a5d78f0e85aed,20,13,ok
+BET,5f92b5ba040eaa0007074d0a,pluto,5f92b5ba040eaa0007074d0a,0,0,missing
+BET Her,5d51e6949ab8e2b35bdcaa9f,epgshare,BET.Her.us2,107,56,fallback
+Big Ten Network,big-ten-network.us,epgshare,Big.Ten.Network.HD.us2,109,63,ok
+Bloomberg TV,bloomberg-tv.us,epgshare,Bloomberg.HD.us2,60,31,ok
+Bloomberg TV,54ff7ba69222cb1c2624c584,pluto,54ff7ba69222cb1c2624c584,9,7,ok
+Boomerang,boomerang.us,epgshare,Boomerang.us2,368,197,ok
+Bounce,bounce.us,epgshare,Bounce.TV.us2,104,59,ok
+Bravo,bravo.us,epgshare,Bravo.HD.us2,98,53,ok
+Buzzr,buzzr.us,epgshare,BUZZR.Stream.us2,160,87,ok
+Buzzr,5812bfbe4ced4f7b601b12e6,pluto,5812bfbe4ced4f7b601b12e6,29,22,ok
+Cartoon Network,cartoon-network.us,epgshare,Cartoon.Network.HD.us2,287,153,ok
+CBS,cbs.us,epgshare,CBS.Streaming.SD.East.feed.us2,101,54,ok
+CBS,6231ec4b62cd1f0007093c7b,pluto,6231ec4b62cd1f0007093c7b,0,0,missing
+Cinemax,cinemax.us,epgshare,Cinemax.HD.us2,54,29,ok
+CMT,5dcc42446750e200093b15e2,epgshare,CMT.HD.us2,163,89,fallback
+CMT,5b4e94282d4ec87bdcbb87cd,pluto,5b4e94282d4ec87bdcbb87cd,8,6,ok
+CMT,5f68f53eb1e5800007390bf8,pluto,5f68f53eb1e5800007390bf8,17,13,ok
+CNBC,cnbc.us,epgshare,CNBC.HD.us2,82,43,ok
+CNN,cnn.us,epgshare,CNN.HD.us2,48,17,ok
+Comedy TV,comedy-tv.us,epgshare,Comedy.TV.HD.us2,171,95,ok
+Court TV,5dae0b4841a7d0000938ddbd,pluto,5dae0b4841a7d0000938ddbd,17,13,ok
+Court TV,court-tv.us,epgshare,Court.TV.us2,99,51,ok
+Crime + Investigation,crime-plus-investigation.us,epgshare,Crime.and.Investigation.Network.HD.us2,107,54,ok
+Crime + Investigation,6732499ce40c4a0008bb9894,pluto,6732499ce40c4a0008bb9894,20,15,ok
+Destination America,destination-america.us,epgshare,Destination.America.HD.us2,187,98,ok
+Discovery Channel,discovery-channel.us,epgshare,Discovery.Channel.HD.us2,95,51,ok
+Disney Channel,disney-channel.us,epgshare,Disney.Channel.HD.us2,192,103,ok
+Disney Jr,disney-jr.us,epgshare,Disney.Junior.HD.us2,202,99,ok
+Disney XD,disney-xd.us,epgshare,Disney.XD.HD.us2,190,103,ok
+E! Entertainment Television,e-entertainment-television.us,epgshare,E!.Entertainment.Television.HD.us2,98,55,ok
+ESPN,espn.us,epgshare,ESPN.HD.us2,78,40,ok
+ESPN 2,espn-2.us,epgshare,ESPN2.HD.us2,78,41,ok
+EstrellaTV,estrellatv.us,epgshare,Estrella.TV.us2,113,61,ok
+EstrellaTV,5cf0622da00ca1e2f6fac712,pluto,5cf0622da00ca1e2f6fac712,16,12,ok
+Food Network,food-network.us,epgshare,Food.Network.HD.us2,93,45,ok
+Fox,fox.us,kanya,Fox.us@East,26,15,ok
+Fox Deportes,63d0269d60bc8f000890facc,epgshare,Fox.Deportes.HD.us2,94,50,fallback
+Fox News,fox-news.us,epgshare,Fox.News.Channel.HD.us2,68,37,ok
+Fox Sports,fox-sports.us,epgshare,FS1.Fox.Sports.1.HD.us2,67,37,ok
+Fox Sports,5a74b8e1e22a61737979c6bf,pluto,5a74b8e1e22a61737979c6bf,26,20,ok
+Fox Weather,fox-weather.us,kanya,FoxWeather.us@SD,14,5,ok
+Fox Weather,640a68880e884c0009979cc2,pluto,640a68880e884c0009979cc2,5,3,ok
+Game Show Network,game-show-network.us,epgshare,Game.Show.Network.HD.us2,168,89,ok
+Game Show Network,5e54187aae660e00093561d6,pluto,5e54187aae660e00093561d6,36,29,ok
+Gol TV,gol-tv.us,epgshare,GOL.TV.us2,72,37,ok
+HBO,hbo.us,epgshare,HBO.East.us2,91,48,ok
+HBO Family,hbo-family.us,kanya,HBOFamily.us@East,0,0,no_programmes
+HBO Signature,hbo-signature.us,epgshare,HBO.Signature.HD.us2,92,58,ok
+HGTV,hgtv.us,kanya,HGTV.us@East,68,41,ok
+History,history.us,epgshare,History.HD.us2,109,57,ok
+HLN,hln.us,epgshare,HLN.HD.us2,180,97,ok
+IFC,ifc.us,epgshare,IFC.HD.us2,174,85,ok
+Investigation Discovery,investigation-discovery.us,epgshare,Investigation.Discovery.HD.us2,95,50,ok
+Ion,ion.us,epgshare,ION.Television.HD.us2,108,57,ok
+Ion,65453f30085df200085883d8,pluto,65453f30085df200085883d8,17,13,ok
+Ion Mystery,ion-mystery.us,epgshare,ION.Mystery.us2,72,21,ok
+Lifetime,lifetime.us,epgshare,Lifetime.HD.us2,110,59,ok
+MLB Network,5e66968a70f34c0007d050be,pluto,5e66968a70f34c0007d050be,13,10,ok
+MLB Network,mlb-network.us,epgshare,MLB.Network.HD.us2,70,36,ok
+MoreMax,moremax.us,kanya,MoreMax.us@East,38,21,ok
+MSG,msg.us,epgshare,MSG.National.us2,98,55,ok
+MTV,mtv.us,epgshare,MTV.-.Music.Television.HD.us2,170,88,ok
+MTV,5caf32c2a5068259a32320fc,pluto,5caf32c2a5068259a32320fc,0,0,missing
+MTV,5db6a697d5f34a000934cd13,pluto,5db6a697d5f34a000934cd13,0,0,missing
+MTV,5ca672f515a62078d2ec0ad2,pluto,5ca672f515a62078d2ec0ad2,31,26,ok
+MTV,5ca6899a37b88b269472ea4b,pluto,5ca6899a37b88b269472ea4b,0,0,missing
+MTV,5caf325764025859afdd6c4d,pluto,5caf325764025859afdd6c4d,0,0,missing
+MTV,5ea815a515d149000748ee9b,pluto,5ea815a515d149000748ee9b,0,0,missing
+MTV,5caf330ea5068259a32320fd,pluto,5caf330ea5068259a32320fd,0,0,missing
+MTV,5d14fdb8ca91eedee1633117,pluto,5d14fdb8ca91eedee1633117,17,13,ok
+MTV,5ea812e0ba6c1f00079d3b7e,pluto,5ea812e0ba6c1f00079d3b7e,0,0,missing
+MTV Classic,5f779951372da90007fd45e8,pluto,5f779951372da90007fd45e8,11,8,ok
+MTV Classic,mtv-classic.us,epgshare,MTV.Classic.us2,96,51,ok
+MTV2,mtv2.us,epgshare,MTV2:.Music.Television.HD.us2,134,68,ok
+National Geographic,national-geographic.us,epgshare,National.Geographic.HD.us2,116,64,ok
+National Geographic Wild,national-geographic-wild.us,epgshare,National.Geographic.Wild.HD.us2,114,61,ok
+NBA TV,6792c30abc03978b9b8bb832,pluto,6792c30abc03978b9b8bb832,27,21,ok
+NBC,nbc.us,epgshare,NBC.East.Stream.us2,116,61,ok
+NBC Sports Bay Area,nbc-sports-bay-area.us,epgshare,NBC.Sports.Bay.Area.HD.us2,126,75,ok
+Newsmax,newsmax.us,epgshare,Newsmax.TV.HD.us2,83,44,ok
+NFL Network,nfl-network.us,epgshare,NFL.Network.HD.us2,60,33,ok
+NFL Network,5ced7d5df64be98e07ed47b6,pluto,5ced7d5df64be98e07ed47b6,16,12,ok
+NHL Network,nhl-network.us,epgshare,NHL.Network.HD.us2,118,60,ok
+Nick Jr,nick-jr.us,epgshare,Nick.Jr.HD.us2,198,107,ok
+Nick Music,5873fc21cad696fb37aa9054,pluto,5873fc21cad696fb37aa9054,12,9,ok
+Nick Music,nick-music.us,epgshare,Nick.Music.us2,96,51,ok
+Nickelodeon,nickelodeon.us,epgshare,Nickelodeon.HD.us2,147,81,ok
+Nicktoons,nicktoons.us,epgshare,Nicktoons.us2,225,121,ok
+Nicktoons,654ca7f92c1d3300086b608c,pluto,654ca7f92c1d3300086b608c,0,0,missing
+Oxygen True Crime,oxygen-true-crime.us,epgshare,Oxygen.True.Crime.HD.us2,90,45,ok
+Oxygen True Crime,654930a8346f420008d3b0b8,pluto,654930a8346f420008d3b0b8,18,14,ok
+Paramount Network,paramount-network.us,epgshare,Paramount.Network.HD.us2,83,43,ok
+PBS,pbs.us,epgshare,PBS.Stream.us2,131,70,ok
+PBS Kids,pbs-kids.us,epgshare,PBS.KIDS.HD.us2,189,102,ok
+Pursuit,pursuit.us,epgshare,Pursuit.Channel.us2,189,102,ok
+QVC,qvc.us,epgshare,QVC.HD.us2,69,32,ok
+QVC,5bdcdf1e851dd5632e2c11d1,pluto,5bdcdf1e851dd5632e2c11d1,12,8,ok
+Racer Network,racer-network.us,epgshare,RACER.Network.HD.us2,155,88,ok
+Reelz,reelz.us,epgshare,ReelzChannel.HD.us2,137,71,ok
+Revolt,revolt.us,epgshare,Revolt.HD.us2,120,64,ok
+SEC Network,sec-network.us,epgshare,SEC.Network.HD.us2,70,38,ok
+Showtime,5f988934a507de00075d9ae7,epgshare,Paramount+.with.Showtime.HD.us2,48,23,fallback
+Smithsonian Channel,smithsonian-channel.us,epgshare,Smithsonian.HD.Network.us2,96,51,ok
+Smithsonian Channel,5f21ea08007a49000762d349,pluto,5f21ea08007a49000762d349,17,13,ok
+Starz Comedy,starz-comedy.us,epgshare,Starz.Comedy.HD.us2,59,30,ok
+Sundance TV,sundance-tv.us,epgshare,SundanceTV.HD.us2,100,57,ok
+SYFY,syfy.us,epgshare,Syfy.HD.us2,80,38,ok
+TBS,tbs.us,epgshare,TBS.HD.us2,177,95,ok
+TCM,tcm.us,epgshare,Turner.Classic.Movies.HD.us2,52,27,ok
+TeenNick,teennick.us,kanya,TeenNick.us@East,122,71,ok
+TeenNick,5f0d668b872e4400073acc68,pluto,5f0d668b872e4400073acc68,0,0,missing
+Telemundo,telemundo.us,epgshare,Telemundo.Satellite.Feed.us2,104,56,ok
+Tennis Channel,tennis-channel.us,epgshare,Tennis.Channel.HD.us2,24,12,ok
+TLC,tlc.us,epgshare,TLC.HD.(US).us2,96,52,ok
+TNT,tnt.us,epgshare,TNT.HD.us2,72,36,ok
+Toonami Aftermath (East),toonami-aftermath-east.us,,,0,0,unmapped
+Travel Channel,travel-channel.us,epgshare,The.Travel.Channel.HD.us2,99,55,ok
+TruTV,trutv.us,epgshare,truTV.HD.us2,153,77,ok
+TV Land,tv-land.us,epgshare,TV.Land.HD.us2,164,89,ok
+TV Land,5c2d64ffbdf11b71587184b8,pluto,5c2d64ffbdf11b71587184b8,33,26,ok
+TV Land,5d40bebc5e3d2750a2239d7e,pluto,5d40bebc5e3d2750a2239d7e,17,13,ok
+TV One,tv-one.us,epgshare,TV.ONE.HD.us2,160,90,ok
+Univision,univision.us,epgshare,Univision.Network.HD.us2,106,59,ok
+USA Network,usa-network.us,epgshare,USA.Network.HD.us2,94,49,ok
+VH1,vh1.us,epgshare,VH1.HD.us2,152,78,ok
+Vice TV,vice-tv.us,epgshare,Vice.HD.us2,108,56,ok
+We TV,we-tv.us,epgshare,WE.tv.HD.us2,98,53,ok
+YES Network,yes-network.us,epgshare,Yes.Network.us2,73,42,ok

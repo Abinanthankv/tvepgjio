@@ -1,143 +1,143 @@
 {
   "5StarMax": {
-    "source": "kanya",
-    "id": "5StarMax.us@East"
+    "source": "epgshare",
+    "id": "5.StarMAX.HD.East.us2"
   },
   "ABC": {
-    "source": "kanya",
-    "id": "ABC.us@East"
+    "source": "epgshare",
+    "id": "ABC.National.Feed.us2"
   },
   "ACC Network": {
-    "source": "kanya",
-    "id": "ACCNetwork.us@SD"
+    "source": "epgshare",
+    "id": "ACC.Network.us2"
   },
   "AMC": {
-    "source": "kanya",
-    "id": "AMC.us@East"
+    "source": "epgshare",
+    "id": "AMC.HD.us2"
   },
   "Animal Planet": {
-    "source": "kanya",
-    "id": "AnimalPlanet.us@East"
+    "source": "epgshare",
+    "id": "Animal.Planet.HD.us2"
   },
   "AWE": {
     "source": "epgshare",
     "id": "AWE.A.Wealth.of.Entertainment.HD.us2"
   },
   "BBC News": {
-    "source": "kanya",
-    "id": "BBCNews.uk@NorthAmerica"
+    "source": "epgshare",
+    "id": "BBC.News.(North.America).HD.us2"
   },
   "beIN Sports XTRA": {
     "source": "kanya",
     "id": "beINSPORTSXTRA.us@SD"
   },
   "BET": {
-    "source": "kanya",
-    "id": "BET.us@East"
+    "source": "epgshare",
+    "id": "BET.HD.us2"
   },
   "BET Her": {
-    "source": "kanya",
-    "id": "BETHer.us@East"
+    "source": "epgshare",
+    "id": "BET.Her.us2"
   },
   "Big Ten Network": {
-    "source": "kanya",
-    "id": "BigTenNetwork.us@SD"
+    "source": "epgshare",
+    "id": "Big.Ten.Network.HD.us2"
   },
   "Bloomberg TV": {
-    "source": "kanya",
-    "id": "BloombergTV.us@US"
+    "source": "epgshare",
+    "id": "Bloomberg.HD.us2"
   },
   "Boomerang": {
-    "source": "kanya",
-    "id": "Boomerang.us@SD"
+    "source": "epgshare",
+    "id": "Boomerang.us2"
   },
   "Bounce": {
     "source": "epgshare",
     "id": "Bounce.TV.us2"
   },
   "Bravo": {
-    "source": "kanya",
-    "id": "Bravo.us@East"
+    "source": "epgshare",
+    "id": "Bravo.HD.us2"
   },
   "Buzzr": {
-    "source": "kanya",
-    "id": "Buzzr.us@SD"
+    "source": "epgshare",
+    "id": "BUZZR.Stream.us2"
   },
   "Cartoon Network": {
-    "source": "kanya",
-    "id": "CartoonNetwork.us@East"
+    "source": "epgshare",
+    "id": "Cartoon.Network.HD.us2"
   },
   "CBS": {
     "source": "epgshare",
     "id": "CBS.Streaming.SD.East.feed.us2"
   },
   "Cinemax": {
-    "source": "kanya",
-    "id": "Cinemax.us@East"
+    "source": "epgshare",
+    "id": "Cinemax.HD.us2"
   },
   "CMT": {
-    "source": "kanya",
-    "id": "CMT.us@East"
+    "source": "epgshare",
+    "id": "CMT.HD.us2"
   },
   "CNBC": {
-    "source": "kanya",
-    "id": "CNBC.us@SD"
+    "source": "epgshare",
+    "id": "CNBC.HD.us2"
   },
   "CNN": {
-    "source": "kanya",
-    "id": "CNN.us@SD"
+    "source": "epgshare",
+    "id": "CNN.HD.us2"
   },
   "Comedy TV": {
     "source": "epgshare",
     "id": "Comedy.TV.HD.us2"
   },
   "Court TV": {
-    "source": "kanya",
-    "id": "CourtTV.us@SD"
+    "source": "epgshare",
+    "id": "Court.TV.us2"
   },
   "Crime + Investigation": {
-    "source": "kanya",
-    "id": "CrimePlusInvestigation.us@SD"
+    "source": "epgshare",
+    "id": "Crime.and.Investigation.Network.HD.us2"
   },
   "Destination America": {
-    "source": "kanya",
-    "id": "DestinationAmerica.us@SD"
+    "source": "epgshare",
+    "id": "Destination.America.HD.us2"
   },
   "Discovery Channel": {
-    "source": "kanya",
-    "id": "DiscoveryChannel.us@East"
+    "source": "epgshare",
+    "id": "Discovery.Channel.HD.us2"
   },
   "Disney Channel": {
-    "source": "kanya",
-    "id": "DisneyChannel.us@East"
+    "source": "epgshare",
+    "id": "Disney.Channel.HD.us2"
   },
   "Disney Jr": {
-    "source": "kanya",
-    "id": "DisneyJunior.us@East"
+    "source": "epgshare",
+    "id": "Disney.Junior.HD.us2"
   },
   "Disney XD": {
-    "source": "kanya",
-    "id": "DisneyXD.us@East"
+    "source": "epgshare",
+    "id": "Disney.XD.HD.us2"
   },
   "E! Entertainment Television": {
-    "source": "kanya",
-    "id": "E.us@East"
+    "source": "epgshare",
+    "id": "E!.Entertainment.Television.HD.us2"
   },
   "ESPN": {
-    "source": "kanya",
-    "id": "ESPN.us@SD"
+    "source": "epgshare",
+    "id": "ESPN.HD.us2"
   },
   "ESPN 2": {
     "source": "epgshare",
     "id": "ESPN2.HD.us2"
   },
   "EstrellaTV": {
-    "source": "kanya",
-    "id": "EstrellaTV.us@SD"
+    "source": "epgshare",
+    "id": "Estrella.TV.us2"
   },
   "Food Network": {
-    "source": "kanya",
-    "id": "FoodNetwork.us@East"
+    "source": "epgshare",
+    "id": "Food.Network.HD.us2"
   },
   "Fox": {
     "source": "kanya",
@@ -148,8 +148,8 @@
     "id": "Fox.Deportes.HD.us2"
   },
   "Fox News": {
-    "source": "kanya",
-    "id": "FoxNewsChannel.us@SD"
+    "source": "epgshare",
+    "id": "Fox.News.Channel.HD.us2"
   },
   "Fox Sports": {
     "source": "epgshare",
@@ -160,56 +160,60 @@
     "id": "FoxWeather.us@SD"
   },
   "Game Show Network": {
-    "source": "kanya",
-    "id": "GameShowNetwork.us@East"
+    "source": "epgshare",
+    "id": "Game.Show.Network.HD.us2"
   },
   "Gol TV": {
     "source": "epgshare",
     "id": "GOL.TV.us2"
   },
   "HBO": {
-    "source": "kanya",
-    "id": "HBO.us@East"
+    "source": "epgshare",
+    "id": "HBO.East.us2"
   },
   "HBO Family": {
     "source": "kanya",
     "id": "HBOFamily.us@East"
   },
   "HBO Signature": {
-    "source": "kanya",
-    "id": "HBOSignature.us@East"
+    "source": "epgshare",
+    "id": "HBO.Signature.HD.us2"
   },
   "HGTV": {
     "source": "kanya",
     "id": "HGTV.us@East"
   },
   "History": {
-    "source": "kanya",
-    "id": "History.us@East"
+    "source": "epgshare",
+    "id": "History.HD.us2"
   },
   "HLN": {
-    "source": "kanya",
-    "id": "HLN.us@SD"
+    "source": "epgshare",
+    "id": "HLN.HD.us2"
   },
   "IFC": {
-    "source": "kanya",
-    "id": "IFC.us@East"
+    "source": "epgshare",
+    "id": "IFC.HD.us2"
+  },
+  "Investigation Discovery": {
+    "source": "epgshare",
+    "id": "Investigation.Discovery.HD.us2"
   },
   "Ion": {
-    "source": "kanya",
-    "id": "IONTV.us@East"
+    "source": "epgshare",
+    "id": "ION.Television.HD.us2"
   },
   "Ion Mystery": {
-    "source": "kanya",
-    "id": "62b45f15b4508e0eedacdf26"
+    "source": "epgshare",
+    "id": "ION.Mystery.us2"
   },
   "Lifetime": {
-    "source": "kanya",
-    "id": "Lifetime.us@East"
+    "source": "epgshare",
+    "id": "Lifetime.HD.us2"
   },
   "MLB Network": {
-    "source": "kanya",
-    "id": "MLBNetwork.us@SD"
+    "source": "epgshare",
+    "id": "MLB.Network.HD.us2"
   },
   "MoreMax": {
     "source": "kanya",
@@ -217,31 +221,31 @@
   },
   "MSG": {
     "source": "epgshare",
-    "id": "MSG.Zone.1.us2"
+    "id": "MSG.National.us2"
   },
   "MTV": {
-    "source": "kanya",
-    "id": "MTV.us@East"
+    "source": "epgshare",
+    "id": "MTV.-.Music.Television.HD.us2"
   },
   "MTV Classic": {
     "source": "epgshare",
     "id": "MTV.Classic.us2"
   },
   "MTV2": {
-    "source": "kanya",
-    "id": "MTV2.us@East"
+    "source": "epgshare",
+    "id": "MTV2:.Music.Television.HD.us2"
   },
   "National Geographic": {
-    "source": "kanya",
-    "id": "NationalGeographic.us@East"
+    "source": "epgshare",
+    "id": "National.Geographic.HD.us2"
   },
   "National Geographic Wild": {
-    "source": "kanya",
-    "id": "NationalGeographicWild.us@East"
+    "source": "epgshare",
+    "id": "National.Geographic.Wild.HD.us2"
   },
   "NBA TV": {
-    "source": "kanya",
-    "id": "NBATV.us@SD"
+    "source": "epgshare",
+    "id": "NBA.TV.HD.us2"
   },
   "NBC": {
     "source": "epgshare",
@@ -256,44 +260,44 @@
     "id": "Newsmax.TV.HD.us2"
   },
   "NFL Network": {
-    "source": "kanya",
-    "id": "NFLNetwork.us@SD"
+    "source": "epgshare",
+    "id": "NFL.Network.HD.us2"
   },
   "NHL Network": {
-    "source": "kanya",
-    "id": "NHLNetwork.us@SD"
+    "source": "epgshare",
+    "id": "NHL.Network.HD.us2"
   },
   "Nick Jr": {
-    "source": "kanya",
-    "id": "NickJr.us@East"
+    "source": "epgshare",
+    "id": "Nick.Jr.HD.us2"
   },
   "Nick Music": {
     "source": "epgshare",
     "id": "Nick.Music.us2"
   },
   "Nickelodeon": {
-    "source": "kanya",
-    "id": "Nickelodeon.us@East"
+    "source": "epgshare",
+    "id": "Nickelodeon.HD.us2"
   },
   "Nicktoons": {
-    "source": "kanya",
-    "id": "Nicktoons.us@East"
+    "source": "epgshare",
+    "id": "Nicktoons.us2"
   },
   "Outdoor Channel": {
     "source": "kanya",
     "id": "OutdoorChannel.us@SD"
   },
   "Oxygen True Crime": {
-    "source": "kanya",
-    "id": "Oxygen.us@East"
+    "source": "epgshare",
+    "id": "Oxygen.True.Crime.HD.us2"
   },
   "Paramount Network": {
-    "source": "kanya",
-    "id": "ParamountNetwork.us@East"
+    "source": "epgshare",
+    "id": "Paramount.Network.HD.us2"
   },
   "PBS": {
-    "source": "kanya",
-    "id": "PBS.us@East"
+    "source": "epgshare",
+    "id": "PBS.Stream.us2"
   },
   "PBS Kids": {
     "source": "epgshare",
@@ -304,108 +308,108 @@
     "id": "Pursuit.Channel.us2"
   },
   "QVC": {
-    "source": "kanya",
-    "id": "QVC.us@SD"
+    "source": "epgshare",
+    "id": "QVC.HD.us2"
   },
   "Racer Network": {
     "source": "epgshare",
     "id": "RACER.Network.HD.us2"
   },
   "Reelz": {
-    "source": "kanya",
-    "id": "Reelz.us@SD"
+    "source": "epgshare",
+    "id": "ReelzChannel.HD.us2"
   },
   "Revolt": {
     "source": "epgshare",
     "id": "Revolt.HD.us2"
   },
   "SEC Network": {
-    "source": "kanya",
-    "id": "SECNetwork.us@SD"
+    "source": "epgshare",
+    "id": "SEC.Network.HD.us2"
   },
   "Showtime": {
     "source": "epgshare",
     "id": "Paramount+.with.Showtime.HD.us2"
   },
   "Smithsonian Channel": {
-    "source": "kanya",
-    "id": "SmithsonianChannel.us@East"
+    "source": "epgshare",
+    "id": "Smithsonian.HD.Network.us2"
   },
   "Starz Comedy": {
-    "source": "kanya",
-    "id": "StarzComedy.us@East"
+    "source": "epgshare",
+    "id": "Starz.Comedy.HD.us2"
   },
   "Sundance TV": {
-    "source": "kanya",
-    "id": "SundanceTV.us@East"
+    "source": "epgshare",
+    "id": "SundanceTV.HD.us2"
   },
   "SYFY": {
-    "source": "kanya",
-    "id": "Syfy.us@East"
+    "source": "epgshare",
+    "id": "Syfy.HD.us2"
   },
   "TBS": {
-    "source": "kanya",
-    "id": "TBS.us@East"
+    "source": "epgshare",
+    "id": "TBS.HD.us2"
   },
   "TCM": {
-    "source": "kanya",
-    "id": "TCM.us@East"
+    "source": "epgshare",
+    "id": "Turner.Classic.Movies.HD.us2"
   },
   "TeenNick": {
     "source": "kanya",
     "id": "TeenNick.us@East"
   },
   "Telemundo": {
-    "source": "kanya",
-    "id": "Telemundo.us@East"
+    "source": "epgshare",
+    "id": "Telemundo.Satellite.Feed.us2"
   },
   "Tennis Channel": {
     "source": "epgshare",
     "id": "Tennis.Channel.HD.us2"
   },
   "TLC": {
-    "source": "kanya",
-    "id": "TLC.us@East"
+    "source": "epgshare",
+    "id": "TLC.HD.(US).us2"
   },
   "TNT": {
-    "source": "kanya",
-    "id": "TNT.us@East"
+    "source": "epgshare",
+    "id": "TNT.HD.us2"
   },
   "Travel Channel": {
-    "source": "kanya",
-    "id": "TravelChannel.us@East"
+    "source": "epgshare",
+    "id": "The.Travel.Channel.HD.us2"
   },
   "TruTV": {
-    "source": "kanya",
-    "id": "truTV.us@East"
+    "source": "epgshare",
+    "id": "truTV.HD.us2"
   },
   "TV Land": {
-    "source": "kanya",
-    "id": "TVLand.us@East"
+    "source": "epgshare",
+    "id": "TV.Land.HD.us2"
   },
   "TV One": {
     "source": "epgshare",
     "id": "TV.ONE.HD.us2"
   },
   "Univision": {
-    "source": "kanya",
-    "id": "Univision.us@East"
+    "source": "epgshare",
+    "id": "Univision.Network.HD.us2"
   },
   "USA Network": {
-    "source": "kanya",
-    "id": "USANetwork.us@East"
+    "source": "epgshare",
+    "id": "USA.Network.HD.us2"
   },
   "VH1": {
-    "source": "kanya",
-    "id": "VH1.us@East"
+    "source": "epgshare",
+    "id": "VH1.HD.us2"
   },
   "Vice TV": {
-    "source": "kanya",
-    "id": "VICETV.us@SD"
+    "source": "epgshare",
+    "id": "Vice.HD.us2"
   },
   "We TV": {
-    "source": "kanya",
-    "id": "WeTV.us@East"
+    "source": "epgshare",
+    "id": "WE.tv.HD.us2"
   },
   "YES Network": {
     "source": "epgshare",

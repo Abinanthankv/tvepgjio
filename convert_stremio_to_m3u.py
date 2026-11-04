@@ -8,7 +8,8 @@ channel at all.  This converter:
 * drops audio-only, dead, macro-filled and known non-US/junk streams;
 * removes duplicate URLs (ignoring tracking parameters);
 * gives every feed a unique, readable title (channel + source + quality);
-* uses stable XMLTV ids that match ``usa_epg.xml.gz``;
+* uses the guide's native Pluto id for Pluto feeds and stable canonical ids
+  for everything else, all matching ``usa_epg.xml.gz``;
 * attaches the generated USA guide through ``url-tvg`` / ``x-tvg-url``;
 * sorts channels by genre and name so the output is deterministic.
 
@@ -65,6 +66,7 @@ JUNK_URL_PATTERNS = [
 JUNK_URL_RE = re.compile("|".join(JUNK_URL_PATTERNS), re.IGNORECASE)
 MACRO_URL_RE = re.compile(r"\{[A-Z_]+\}")
 DEAD_STREAM_RE = re.compile(r"\[dead\]|\bdead\b|\boffline\b|\bnot working\b", re.I)
+PLUTO_ID_RE = re.compile(r"/channel/([a-f0-9]{24})(?:/|$)", re.IGNORECASE)
 
 # Friendly names for the short tags the upstream harvester stores in the
 # stream description (``HV:JMP2``, ``HV:SERVICE-STIT``, ...).
@@ -198,6 +200,14 @@ def source_of(stream: dict) -> str:
     return ""
 
 
+def pluto_id_of(url: str) -> str:
+    """Return the native Pluto channel id embedded in a Pluto stream URL."""
+    if "pluto" not in (urlsplit(url).hostname or "").lower():
+        return ""
+    match = PLUTO_ID_RE.search(url)
+    return match.group(1).lower() if match else ""
+
+
 def normalize_url(url: str) -> str:
     """Normalize a URL for duplicate detection without dropping required params."""
     parts = urlsplit(url)
@@ -275,6 +285,7 @@ def build(repo_dir: Path, output: Path, epg_url: str) -> int:
                     "url": url,
                     "quality": quality_of(stream),
                     "source": source_of(stream),
+                    "pluto_id": pluto_id_of(url),
                 }
             )
 
@@ -330,12 +341,18 @@ def build(repo_dir: Path, output: Path, epg_url: str) -> int:
     lines = [f'#EXTM3U url-tvg="{m3u_attr(epg_url)}" x-tvg-url="{m3u_attr(epg_url)}"']
     stream_count = 0
     mapped_channels = 0
+    native_pluto_streams = 0
+    native_pluto_ids: set[str] = set()
     for channel in channels:
-        tvg_id = canonical_id(channel["name"])
+        canonical = canonical_id(channel["name"])
         if channel["name"] in aliases:
             mapped_channels += 1
         group = f"USA | {channel['genre']}"
         for item in channel["streams"]:
+            tvg_id = item["pluto_id"] or canonical
+            if item["pluto_id"]:
+                native_pluto_streams += 1
+                native_pluto_ids.add(item["pluto_id"])
             lines.append(
                 f'#EXTINF:-1 tvg-id="{m3u_attr(tvg_id)}" '
                 f'tvg-name="{m3u_attr(channel["name"])}" '
@@ -364,6 +381,7 @@ def build(repo_dir: Path, output: Path, epg_url: str) -> int:
     )
     print(
         f"[4/4] EPG ids use {mapped_channels}/{len(channels)} mapped channels; "
+        f"{native_pluto_streams} Pluto feeds use {len(native_pluto_ids)} native ids; "
         f"guide: {epg_url}"
     )
 

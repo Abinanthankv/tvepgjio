@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Build a compact USA XMLTV guide for ``usa_tv_next.m3u``.
 
-The playlist draws on two community guides.  This script downloads both,
-keeps only the channels that appear in ``usa_epg_aliases.json``, rewrites their
-ids to the same canonical ids used by the playlist, and writes one small guide:
+The playlist draws on three community guides.  This script downloads them,
+keeps only the channels referenced by the playlist (curated aliases plus the
+native Pluto ids embedded in Pluto stream URLs), rewrites curated ids to the
+same canonical ids used by the playlist, and writes one small guide:
 
     usa_epg.xml
     usa_epg.xml.gz
@@ -19,6 +20,7 @@ from __future__ import annotations
 import argparse
 import copy
 import csv
+import datetime
 import gzip
 import html
 import json
@@ -35,6 +37,7 @@ from usa_epg_common import canonical_id, clean_channel_name
 SOURCES = {
     "kanya": "https://epg.kanya.io/us/guide.xml.gz",
     "epgshare": "https://epgshare01.online/epgshare01/epg_ripper_US2.xml.gz",
+    "pluto": "https://github.com/matthuisman/i.mjh.nz/raw/master/PlutoTV/us.xml.gz",
 }
 DEFAULT_ALIASES = Path("usa_epg_aliases.json")
 DEFAULT_M3U = Path("usa_tv_next.m3u")
@@ -48,6 +51,7 @@ USER_AGENT = (
 )
 EXTINF_ID_RE = re.compile(r'tvg-id="([^"]*)"')
 EXTINF_NAME_RE = re.compile(r'tvg-name="([^"]*)"')
+PLUTO_ID_RE = re.compile(r"^[a-f0-9]{24}$")
 
 
 def download(url: str, destination: Path, refresh: bool) -> Path:
@@ -70,6 +74,12 @@ def download(url: str, destination: Path, refresh: bool) -> Path:
                     output.write(chunk)
     except (OSError, urllib.error.URLError) as exc:
         temporary.unlink(missing_ok=True)
+        if destination.is_file() and destination.stat().st_size > 0:
+            print(
+                f"      WARNING: download failed ({exc}); "
+                f"using cached {destination.name}"
+            )
+            return destination
         raise RuntimeError(f"could not download {url}: {exc}") from exc
 
     temporary.replace(destination)
@@ -148,14 +158,21 @@ def build(
     playlist_channels = parse_m3u_channels(m3u_path)
     playlist_ids = set(playlist_channels)
 
+    native_pluto_ids = {tvg_id for tvg_id in playlist_ids if PLUTO_ID_RE.fullmatch(tvg_id)}
+
     needed: dict[str, set[str]] = defaultdict(set)
     for mapping in aliases.values():
         source = mapping.get("source")
         source_id = mapping.get("id")
         if source in SOURCES and source_id:
             needed[source].add(source_id)
+    if native_pluto_ids:
+        needed["pluto"].update(native_pluto_ids)
 
-    print(f"[1/4] {len(aliases)} aliases across {len(needed)} guide sources.")
+    print(
+        f"[1/4] {len(aliases)} aliases, {len(native_pluto_ids)} native Pluto ids, "
+        f"{len(needed)} guide sources."
+    )
     source_channels: dict[str, dict[str, ET.Element]] = {}
     source_programmes: dict[str, list[ET.Element]] = {}
     source_counts: dict[str, Counter[str]] = {}
@@ -179,14 +196,19 @@ def build(
 
     output_channels: list[ET.Element] = []
     output_programmes: list[ET.Element] = []
-    id_map: dict[tuple[str, str], str] = {}
+    id_map: dict[tuple[str, str], list[str]] = defaultdict(list)
     channel_programme_counts: Counter[str] = Counter()
     missing: list[tuple[str, str, str]] = []
+    missing_native: set[str] = set()
+    fallback_native: set[str] = set()
 
     for name, mapping in sorted(aliases.items(), key=lambda item: item[0].casefold()):
         source = mapping.get("source")
         source_id = mapping.get("id")
         if source not in SOURCES or not source_id:
+            continue
+        canonical = canonical_id(name)
+        if playlist_ids and canonical not in playlist_ids:
             continue
         if source in failed_sources:
             missing.append((name, source, source_id))
@@ -197,28 +219,64 @@ def build(
             missing.append((name, source, source_id))
             continue
 
-        canonical = canonical_id(name)
-        if playlist_ids and canonical not in playlist_ids:
-            continue
         copied = copy.deepcopy(channel)
         copied.set("id", canonical)
         set_display_name(copied, name)
         output_channels.append(copied)
-        id_map[(source, source_id)] = canonical
+        id_map[(source, source_id)].append(canonical)
         channel_programme_counts[canonical] = source_counts[source][source_id]
+
+    for native_id in sorted(native_pluto_ids):
+        name = playlist_channels.get(native_id, native_id)
+        channel = source_channels.get("pluto", {}).get(native_id)
+        if channel is not None:
+            copied = copy.deepcopy(channel)
+            copied.set("id", native_id)
+            set_display_name(copied, name)
+            output_channels.append(copied)
+            id_map[("pluto", native_id)].append(native_id)
+            channel_programme_counts[native_id] = source_counts["pluto"][native_id]
+            continue
+
+        # The Pluto guide does not carry this native id.  Only fall back to the
+        # curated national mapping when the channel has no other guide-bearing
+        # stream, so extra Pluto feeds are not silently given a wrong schedule.
+        mapping = aliases.get(name)
+        canonical = canonical_id(name)
+        if not mapping or (playlist_ids and canonical in playlist_ids):
+            missing_native.add(native_id)
+            continue
+        source = mapping.get("source")
+        source_id = mapping.get("id")
+        fallback_channel = source_channels.get(source, {}).get(source_id)
+        if not source or not source_id or fallback_channel is None:
+            missing_native.add(native_id)
+            continue
+
+        copied = copy.deepcopy(fallback_channel)
+        copied.set("id", native_id)
+        set_display_name(copied, name)
+        output_channels.append(copied)
+        id_map[(source, source_id)].append(native_id)
+        channel_programme_counts[native_id] = source_counts[source][source_id]
+        fallback_native.add(native_id)
 
     for source, programmes in source_programmes.items():
         for programme in programmes:
             old_id = programme.get("channel")
-            canonical = id_map.get((source, old_id))
-            if not canonical:
-                continue
-            copied = copy.deepcopy(programme)
-            copied.set("channel", canonical)
-            output_programmes.append(copied)
+            for target_id in id_map.get((source, old_id), []):
+                copied = copy.deepcopy(programme)
+                copied.set("channel", target_id)
+                output_programmes.append(copied)
 
     output_programmes.sort(key=lambda programme: programme.get("start", ""))
     output_channels.sort(key=lambda channel: channel.get("id", ""))
+
+    now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d%H%M%S")
+    future_programme_counts: Counter[str] = Counter()
+    for programme in output_programmes:
+        if programme.get("start", "")[:14] > now:
+            future_programme_counts[programme.get("channel", "")] += 1
 
     tv = ET.Element(
         "tv",
@@ -247,60 +305,69 @@ def build(
     )
 
     report_rows: list[dict[str, object]] = []
-    report_ids = set(playlist_channels)
+    missing_canonical = {canonical_id(name) for name, _source, _source_id in missing}
     for tvg_id, name in sorted(playlist_channels.items(), key=lambda item: item[1].casefold()):
-        mapping = aliases.get(name)
-        if not mapping:
-            report_rows.append(
-                {
-                    "channel": name,
-                    "tvg_id": tvg_id,
-                    "source": "",
-                    "source_id": "",
-                    "programmes": 0,
-                    "status": "unmapped",
-                }
-            )
-            continue
-        count = channel_programme_counts.get(tvg_id, 0)
-        report_rows.append(
-            {
-                "channel": name,
-                "tvg_id": tvg_id,
-                "source": mapping.get("source", ""),
-                "source_id": mapping.get("id", ""),
-                "programmes": count,
-                "status": "ok" if count else "no_programmes",
-            }
-        )
+        if tvg_id in native_pluto_ids and tvg_id not in fallback_native:
+            mapping: dict | None = {"source": "pluto", "id": tvg_id}
+        else:
+            mapping = aliases.get(name)
 
-    for name, source, source_id in missing:
-        tvg_id = canonical_id(name)
-        if tvg_id in report_ids:
-            continue
+        count = channel_programme_counts.get(tvg_id, 0)
+        future = future_programme_counts.get(tvg_id, 0)
+        if not mapping:
+            source = ""
+            source_id = ""
+            status = "unmapped"
+        else:
+            source = str(mapping.get("source", ""))
+            source_id = str(mapping.get("id", ""))
+            if tvg_id in missing_native or canonical_id(name) in missing_canonical:
+                status = "missing"
+            elif tvg_id in fallback_native:
+                status = "fallback"
+            elif count == 0:
+                status = "no_programmes"
+            elif future == 0:
+                status = "stale"
+            else:
+                status = "ok"
+
         report_rows.append(
             {
                 "channel": name,
                 "tvg_id": tvg_id,
                 "source": source,
                 "source_id": source_id,
-                "programmes": 0,
-                "status": "missing",
+                "programmes": count,
+                "future_programmes": future,
+                "status": status,
             }
         )
 
     with report_path.open("w", encoding="utf-8-sig", newline="") as handle:
         writer = csv.DictWriter(
             handle,
-            fieldnames=["channel", "tvg_id", "source", "source_id", "programmes", "status"],
+            fieldnames=[
+                "channel",
+                "tvg_id",
+                "source",
+                "source_id",
+                "programmes",
+                "future_programmes",
+                "status",
+            ],
         )
         writer.writeheader()
         writer.writerows(report_rows)
 
-    ok = sum(1 for row in report_rows if row["status"] == "ok")
+    status_counts = Counter(str(row["status"]) for row in report_rows)
     print(
-        f"[4/4] Report: {ok}/{len(report_rows)} playlist channels have programmes; "
-        f"{len(missing)} aliases missing from their guide."
+        f"[4/4] Report: {status_counts.get('ok', 0)}/{len(report_rows)} playlist ids "
+        f"have current/future programmes; fallback={status_counts.get('fallback', 0)}, "
+        f"stale={status_counts.get('stale', 0)}, "
+        f"no_programmes={status_counts.get('no_programmes', 0)}, "
+        f"unmapped={status_counts.get('unmapped', 0)}, "
+        f"missing={status_counts.get('missing', 0)}."
     )
     if failed_sources:
         print(f"      Failed sources: {', '.join(sorted(failed_sources))}")
@@ -308,8 +375,8 @@ def build(
             return 1
 
     for source in sorted(needed):
-        count = sum(1 for mapping in aliases.values() if mapping.get("source") == source)
-        print(f"      {source:<10} {count:>3} mapped channels")
+        kept = len(source_channels.get(source, {}))
+        print(f"      {source:<10} {kept:>3}/{len(needed[source]):<3} guide channels")
     return 0
 
 
