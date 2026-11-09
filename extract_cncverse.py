@@ -30,7 +30,6 @@ from __future__ import annotations
 import argparse
 import base64
 import binascii
-import html
 import json
 import re
 import sys
@@ -211,8 +210,14 @@ def clean_catalog_name(value: str) -> str:
     return " ".join(text.split()) or "CNCVerse"
 
 
+def m3u_text(value: str) -> str:
+    """Collapse whitespace for M3U labels without HTML entities."""
+    return " ".join(str(value or "").replace("\r", " ").replace("\n", " ").split())
+
+
 def m3u_attr(value: str) -> str:
-    return html.escape(str(value or ""), quote=True)
+    """Quote-safe M3U attribute value (no HTML entity escaping)."""
+    return m3u_text(value).replace('"', "'")
 
 
 def clearkey_pair(clearkey: str) -> tuple[str, str] | None:
@@ -398,7 +403,7 @@ def write_m3u(
             attrs.append(f'tvg-logo="{m3u_attr(logo)}"')
         attrs.append(f'group-title="{m3u_attr(f"CNCVerse | {catalog}")}"')
         lines.append(
-            f'#EXTINF:-1 {" ".join(attrs)},{m3u_attr(channel + quality_text)}'
+            f'#EXTINF:-1 {" ".join(attrs)},{m3u_text(channel + quality_text)}'
         )
         url = str(record.get("url") or "")
         headers = behavior_headers(record)
