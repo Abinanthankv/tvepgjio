@@ -215,6 +215,19 @@ def m3u_attr(value: str) -> str:
     return html.escape(str(value or ""), quote=True)
 
 
+def kodi_license_key(clearkey: str) -> str:
+    """Convert the addon's ``key:keyid`` value to Kodi's ``keyid:key``."""
+    parts = str(clearkey or "").split(":")
+    if len(parts) != 2:
+        return ""
+    key, keyid = parts
+    if not re.fullmatch(r"[0-9a-fA-F]{32}", key):
+        return ""
+    if not re.fullmatch(r"[0-9a-fA-F]{32}", keyid):
+        return ""
+    return f"{keyid}:{key}"
+
+
 def write_m3u(path: Path, records: list[dict], title: str) -> None:
     """Write a combined or per-catalog M3U playlist."""
     lines = ["#EXTM3U"]
@@ -256,7 +269,37 @@ def write_m3u(path: Path, records: list[dict], title: str) -> None:
         lines.append(
             f'#EXTINF:-1 {" ".join(attrs)},{m3u_attr(channel + quality_text)}'
         )
-        lines.append(str(record.get("url") or ""))
+        url = str(record.get("url") or "")
+        hints = record.get("behaviorHints") or {}
+        proxy_headers = (hints.get("proxyHeaders") or {}).get("request") or {}
+        is_proxy = url.startswith("http://129.225.106.195/")
+        # The CNCVerse proxy rejects VLC's default user-agent with HTTP 500.
+        # Direct Jio HLS URLs need the provider's user-agent and cookie.
+        vlc_user_agent = "Mozilla/5.0" if is_proxy else (
+            str(proxy_headers.get("User-Agent") or "Mozilla/5.0")
+        )
+        lines.append(f"#EXTVLCOPT:http-user-agent={vlc_user_agent}")
+        if proxy_headers.get("Referer"):
+            lines.append(f"#EXTVLCOPT:http-referrer={proxy_headers['Referer']}")
+
+        lines.append("#KODIPROP:inputstream=inputstream.adaptive")
+        lines.append("#KODIPROP:inputstream.adaptive.manifest_type=hls")
+        if proxy_headers:
+            header_parts = []
+            for header_name in ("User-Agent", "Cookie", "Referer", "Origin"):
+                header_value = proxy_headers.get(header_name)
+                if header_value:
+                    header_parts.append(f"{header_name}={header_value}")
+            if header_parts:
+                lines.append(
+                    "#KODIPROP:inputstream.adaptive.stream_headers="
+                    + "&".join(header_parts)
+                )
+        license_key = kodi_license_key(record.get("clearkey", ""))
+        if license_key:
+            lines.append("#KODIPROP:inputstream.adaptive.license_type=clearkey")
+            lines.append(f"#KODIPROP:inputstream.adaptive.license_key={license_key}")
+        lines.append(url)
 
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
