@@ -1,0 +1,116 @@
+name: Generate CNCVerse M3U Playlists
+
+on:
+  schedule:
+    # Refresh every 3 hours. CNCVerse links are short-lived.
+    - cron: '15 */3 * * *'
+  workflow_dispatch: # Manual trigger from the Actions tab
+  push:
+    branches:
+      - main
+    paths:
+      - 'extract_cncverse.py'
+      - '.github/workflows/update-cncverse-m3u.yml'
+
+# Prevent overlapping refreshes from force-pushing the same branch.
+concurrency:
+  group: cncverse-playlist-update
+  cancel-in-progress: false
+
+jobs:
+  generate-cncverse-playlists:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Generate CNCVerse playlists
+        run: |
+          python extract_cncverse.py \
+            --all \
+            --quality highest \
+            --split-catalogs \
+            --workers 8 \
+            --min-ttl 900
+
+      - name: Validate generated playlists
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+
+          data = json.loads(Path("cncverse_streams.json").read_text(encoding="utf-8"))
+          records = data.get("records") or []
+          if not records:
+              raise SystemExit("No CNCVerse records were generated")
+
+          playlists = [Path("cncverse.m3u"), *sorted(Path("cncverse_playlists").glob("*.m3u"))]
+          if len(playlists) < 2:
+              raise SystemExit("No per-catalog CNCVerse playlists were generated")
+          for playlist in playlists:
+              lines = playlist.read_text(encoding="utf-8").splitlines()
+              if not lines or lines[0] != "#EXTM3U":
+                  raise SystemExit(f"{playlist}: missing #EXTM3U")
+              entries = [line for line in lines if line.startswith("#EXTINF")]
+              urls = [line for line in lines if line.startswith(("http://", "https://"))]
+              if not entries or len(entries) != len(urls):
+                  raise SystemExit(f"{playlist}: entry/url mismatch")
+              if any('tvg-id="' not in line for line in entries):
+                  raise SystemExit(f"{playlist}: entry missing tvg-id")
+
+          status = {
+              "generated_at": data.get("generated_at"),
+              "manifest": data.get("manifest"),
+              "quality_policy": data.get("quality_policy"),
+              "min_ttl_seconds": data.get("min_ttl_seconds"),
+              "records": len(records),
+              "errors": len(data.get("errors") or []),
+              "quality_counts": dict(Counter(record.get("quality", 0) for record in records)),
+              "playlists": {str(path): sum(1 for line in path.read_text(encoding="utf-8").splitlines() if line.startswith("#EXTINF")) for path in playlists},
+          }
+          Path("cncverse_status.json").write_text(
+              json.dumps(status, indent=2, ensure_ascii=False) + "\n",
+              encoding="utf-8",
+          )
+          print(json.dumps(status, indent=2, ensure_ascii=False))
+          PY
+
+      - name: Publish playlists to cncverse-playlists branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          publish_dir="$(mktemp -d)"
+          cp cncverse.m3u cncverse_status.json "$publish_dir/"
+          cp -R cncverse_playlists "$publish_dir/"
+
+          cd "$publish_dir"
+          git init -q -b cncverse-playlists
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add cncverse.m3u cncverse_status.json cncverse_playlists
+          git commit -q -m "Automated CNCVerse playlist update [skip ci]"
+          git push --force \
+            "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+            HEAD:cncverse-playlists
+
+      - name: Upload audit JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cncverse-streams
+          path: cncverse_streams.json
+          if-no-files-found: ignore
+          retention-days: 7
