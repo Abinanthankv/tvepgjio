@@ -40,6 +40,44 @@ channels and schedules load together.*
 https://raw.githubusercontent.com/Abinanthankv/tvepgjio/main/usa_epg.xml.gz
 ```
 
+### 5. CNCVerse Playlists (DASH/ClearKey preferred) ⭐
+```text
+https://raw.githubusercontent.com/Abinanthankv/tvepgjio/cncverse-playlists/cncverse.m3u
+```
+*Use this with TiviMate, OTT Navigator, or Kodi. When the addon's ClearKey
+KID matches the origin MPD, the playlist points at the origin DASH manifest
+instead of the HTTP proxy. This avoids the proxy's HLS SAMPLE-AES-CTR
+incompatibilities and keeps the stream on HTTPS.*
+
+HLS-only fallback:
+```text
+https://raw.githubusercontent.com/Abinanthankv/tvepgjio/cncverse-playlists/cncverse_hls.m3u
+```
+
+Per-catalog folders:
+```text
+https://github.com/Abinanthankv/tvepgjio/tree/cncverse-playlists/cncverse_playlists
+https://github.com/Abinanthankv/tvepgjio/tree/cncverse-playlists/cncverse_playlists_hls
+```
+
+**Compatibility notes**
+
+* The CNCVerse worker refreshes the playlists every **3 hours** because the
+  provider tokens are short-lived.
+* `cncverse.m3u` is best for players with **DASH + ClearKey** support. Kodi
+  needs InputStream Adaptive. TiviMate/OTT Navigator usually work for Jio TV
+  and SUN NXT; JioHotstar/JIOTV+ may still need provider `Cookie` headers.
+* `cncverse_hls.m3u` keeps the proxy HLS URLs. It is the fallback for
+  HLS-only players.
+* **VLC is not supported for most CNCVerse channels.** The proxy rejects
+  VLC's user-agent, and the streams use SAMPLE-AES-CTR/ClearKey. VLC also
+  cannot set the provider `Cookie` required by some direct Jio HLS feeds.
+* A small number of channels are direct Jio HLS feeds that require a
+  `Cookie` header. Kodi gets those headers through
+  `#KODIPROP:inputstream.adaptive.stream_headers`; generic players may not.
+* The addon is a Stremio bridge. Some providers block or rotate keys, so a
+  few channels can still fail even after a successful refresh.
+
 ---
 
 ## ⚡ Features & Workflows
@@ -51,6 +89,10 @@ https://raw.githubusercontent.com/Abinanthankv/tvepgjio/main/usa_epg.xml.gz
   **once daily** (`cron: '0 0 * * *'`) and commits
   `usa_tv_next.m3u`, `usa_epg.xml`, `usa_epg.xml.gz` and
   `usa_epg_report.csv`.
+* **CNCVerse Workflow** (`update-cncverse-m3u.yml`): Refreshes the CNCVerse
+  combined and per-catalog playlists every **3 hours** and publishes them to
+  the `cncverse-playlists` branch. It validates each origin MPD's ClearKey KID
+  before switching a channel to DASH, and keeps an HLS fallback.
 * **Cleaned USA output**: audio-only streams, dead feeds, duplicate URLs,
   UUID titles and known non-US/junk feeds (for example the Australian
   `abc-*` feeds and the `*_in_90_seconds` clips) are removed. Every remaining
