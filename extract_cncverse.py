@@ -215,20 +215,151 @@ def m3u_attr(value: str) -> str:
     return html.escape(str(value or ""), quote=True)
 
 
-def kodi_license_key(clearkey: str) -> str:
-    """Convert the addon's ``key:keyid`` value to Kodi's ``keyid:key``."""
+def clearkey_pair(clearkey: str) -> tuple[str, str] | None:
+    """Return ``(kid, key)`` from the addon's ``kid:key`` value."""
     parts = str(clearkey or "").split(":")
     if len(parts) != 2:
-        return ""
-    key, keyid = parts
+        return None
+    kid, key = parts
+    if not re.fullmatch(r"[0-9a-fA-F]{32}", kid):
+        return None
     if not re.fullmatch(r"[0-9a-fA-F]{32}", key):
-        return ""
-    if not re.fullmatch(r"[0-9a-fA-F]{32}", keyid):
-        return ""
-    return f"{keyid}:{key}"
+        return None
+    return kid.lower(), key.lower()
 
 
-def write_m3u(path: Path, records: list[dict], title: str) -> None:
+def kodi_license_key(clearkey: str) -> str:
+    """Return the ``kid:key`` string used by Kodi/TiviMate ClearKey."""
+    pair = clearkey_pair(clearkey)
+    return f"{pair[0]}:{pair[1]}" if pair else ""
+
+
+PLAYER_HEADER_NAMES = ("User-Agent", "Cookie", "Referer", "Origin")
+
+
+def behavior_headers(record: dict) -> dict[str, str]:
+    """Return the headers Stremio would send for a direct stream."""
+    hints = record.get("behaviorHints") or {}
+    request = (hints.get("proxyHeaders") or {}).get("request") or {}
+    return {
+        name: str(request[name])
+        for name in PLAYER_HEADER_NAMES
+        if request.get(name)
+    }
+
+
+def proxy_query_headers(url: str) -> dict[str, str]:
+    """Read the ``h_*`` headers embedded in a CNCVerse proxy URL."""
+    query = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)
+    headers: dict[str, str] = {}
+    for name in PLAYER_HEADER_NAMES:
+        values = query.get(f"h_{name}")
+        if values and values[0]:
+            headers[name] = values[0]
+    return headers
+
+
+def proxy_mpd_info(record: dict) -> dict | None:
+    """Return the origin MPD and ClearKey details for a proxy record."""
+    url = str(record.get("url") or "")
+    if not url.startswith("http://129.225.106.195/"):
+        return None
+    query = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)
+    mpd_url = (query.get("d") or [""])[0].strip()
+    clearkey = str(
+        record.get("clearkey") or (query.get("clearkey") or [""])[0] or ""
+    )
+    pair = clearkey_pair(clearkey)
+    if not mpd_url or ".mpd" not in mpd_url.lower() or not pair:
+        return None
+    return {
+        "url": mpd_url,
+        "clearkey": f"{pair[0]}:{pair[1]}",
+        "headers": proxy_query_headers(url),
+    }
+
+
+def fetch_text(url: str, headers: dict[str, str], timeout: int) -> str:
+    request_headers = {"User-Agent": USER_AGENT, **headers}
+    request = urllib.request.Request(url, headers=request_headers)
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        return response.read().decode("utf-8", "replace")
+
+
+def mpd_kids(text: str) -> set[str]:
+    return {
+        kid.replace("-", "").lower()
+        for kid in re.findall(r'default_KID="([0-9A-Fa-f-]+)"', text)
+    }
+
+
+def validate_dash_records(
+    records: list[dict], timeout: int, workers: int
+) -> tuple[int, int]:
+    """Attach origin-MPD details only when the ClearKey KID matches the MPD."""
+    targets = [
+        (index, record)
+        for index, record in enumerate(records)
+        if proxy_mpd_info(record)
+    ]
+    if not targets:
+        return 0, 0
+
+    def check(target: tuple[int, dict]) -> tuple[int, dict | None, str | None]:
+        index, record = target
+        info = proxy_mpd_info(record)
+        if not info:
+            return index, None, "no_mpd"
+        try:
+            text = fetch_text(info["url"], info["headers"], timeout)
+        except Exception as exc:  # noqa: BLE001 - audit the failure, keep HLS
+            return index, None, f"mpd_fetch:{type(exc).__name__}"
+        kids = mpd_kids(text)
+        if not kids:
+            return index, None, "mpd_without_kid"
+        expected_kid = info["clearkey"].split(":", 1)[0]
+        if expected_kid not in kids:
+            return index, None, "clearkey_kid_mismatch"
+        info["kids"] = sorted(kids)
+        return index, info, None
+
+    ready = 0
+    failed = 0
+    print(f"[dash] validating {len(targets)} origin MPDs")
+    if workers > 1:
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            futures = [executor.submit(check, target) for target in targets]
+            for index, future in enumerate(as_completed(futures), 1):
+                record_index, info, error = future.result()
+                if info:
+                    records[record_index]["dash"] = info
+                    ready += 1
+                else:
+                    records[record_index]["dash_error"] = error
+                    failed += 1
+                if index % 100 == 0 or index == len(futures):
+                    print(f"          {index}/{len(futures)}")
+    else:
+        for index, target in enumerate(targets, 1):
+            record_index, info, error = check(target)
+            if info:
+                records[record_index]["dash"] = info
+                ready += 1
+            else:
+                records[record_index]["dash_error"] = error
+                failed += 1
+            if index % 25 == 0 or index == len(targets):
+                print(f"          {index}/{len(targets)}")
+    print(f"[dash] ready: {ready}, HLS fallback: {failed}")
+    return ready, failed
+
+
+def write_m3u(
+    path: Path,
+    records: list[dict],
+    title: str,
+    stream_format: str = "auto",
+) -> None:
     """Write a combined or per-catalog M3U playlist."""
     lines = ["#EXTM3U"]
     id_counts: Counter[str] = Counter()
@@ -270,34 +401,48 @@ def write_m3u(path: Path, records: list[dict], title: str) -> None:
             f'#EXTINF:-1 {" ".join(attrs)},{m3u_attr(channel + quality_text)}'
         )
         url = str(record.get("url") or "")
-        hints = record.get("behaviorHints") or {}
-        proxy_headers = (hints.get("proxyHeaders") or {}).get("request") or {}
-        is_proxy = url.startswith("http://129.225.106.195/")
+        headers = behavior_headers(record)
+        clearkey = str(record.get("clearkey") or "")
+        manifest_type = "hls"
+
+        dash = record.get("dash") if stream_format in ("auto", "dash") else None
+        if dash:
+            # The proxy only exists to turn the origin MPD into HLS. Pointing
+            # at the origin MPD keeps DASH/ClearKey support in TiviMate/Kodi
+            # and avoids the proxy's HLS SAMPLE-AES-CTR incompatibilities.
+            url = str(dash.get("url") or "")
+            headers = dict(dash.get("headers") or {})
+            clearkey = str(dash.get("clearkey") or clearkey)
+            manifest_type = "dash"
+        elif url.startswith("http://129.225.106.195/"):
+            # Proxy URLs already contain their upstream headers in the query.
+            headers = {}
+
         # The CNCVerse proxy rejects VLC's default user-agent with HTTP 500.
-        # Direct Jio HLS URLs need the provider's user-agent and cookie.
-        vlc_user_agent = "Mozilla/5.0" if is_proxy else (
-            str(proxy_headers.get("User-Agent") or "Mozilla/5.0")
-        )
+        # Direct Jio HLS and origin MPDs need the provider's headers.
+        vlc_user_agent = headers.get("User-Agent") or "Mozilla/5.0"
         lines.append(f"#EXTVLCOPT:http-user-agent={vlc_user_agent}")
-        if proxy_headers.get("Referer"):
-            lines.append(f"#EXTVLCOPT:http-referrer={proxy_headers['Referer']}")
+        if headers.get("Referer"):
+            lines.append(f"#EXTVLCOPT:http-referrer={headers['Referer']}")
 
         lines.append("#KODIPROP:inputstream=inputstream.adaptive")
-        lines.append("#KODIPROP:inputstream.adaptive.manifest_type=hls")
-        if proxy_headers:
-            header_parts = []
-            for header_name in ("User-Agent", "Cookie", "Referer", "Origin"):
-                header_value = proxy_headers.get(header_name)
-                if header_value:
-                    header_parts.append(f"{header_name}={header_value}")
+        lines.append(f"#KODIPROP:inputstream.adaptive.manifest_type={manifest_type}")
+        if headers:
+            header_parts = [
+                f"{header_name}={headers[header_name]}"
+                for header_name in PLAYER_HEADER_NAMES
+                if headers.get(header_name)
+            ]
             if header_parts:
                 lines.append(
                     "#KODIPROP:inputstream.adaptive.stream_headers="
                     + "&".join(header_parts)
                 )
-        license_key = kodi_license_key(record.get("clearkey", ""))
+        license_key = kodi_license_key(clearkey)
         if license_key:
-            lines.append("#KODIPROP:inputstream.adaptive.license_type=clearkey")
+            lines.append(
+                "#KODIPROP:inputstream.adaptive.license_type=org.w3.clearkey"
+            )
             lines.append(f"#KODIPROP:inputstream.adaptive.license_key={license_key}")
         lines.append(url)
 
@@ -367,6 +512,26 @@ def extract_item(
     }
 
 
+def write_split_playlists(
+    records: list[dict],
+    playlist_dir: Path,
+    stream_format: str,
+    label: str,
+) -> None:
+    by_catalog: dict[str, list[dict]] = {}
+    for record in records:
+        by_catalog.setdefault(str(record.get("catalog") or ""), []).append(record)
+    for catalog_records in by_catalog.values():
+        catalog_name = clean_catalog_name(catalog_records[0].get("catalog_name", ""))
+        path = playlist_dir / f"cncverse_{slugify(catalog_name)}.m3u"
+        write_m3u(
+            path,
+            catalog_records,
+            f"{catalog_name} {label}",
+            stream_format,
+        )
+
+
 def extract(
     manifest_url: str,
     catalog_filter: str,
@@ -381,6 +546,8 @@ def extract(
     playlist_dir: Path,
     workers: int,
     min_ttl: int,
+    stream_format: str = "auto",
+    hls_fallback: bool = False,
 ) -> int:
     manifest = fetch_json(manifest_url, timeout)
     base = manifest_url.rsplit("/", 1)[0]
@@ -443,13 +610,23 @@ def extract(
                 if index % 10 == 0:
                     print(f"          {index}/{len(items)}")
 
+    dash_ready = 0
+    dash_failed = 0
+    if stream_format == "auto":
+        dash_ready, dash_failed = validate_dash_records(
+            records, min(timeout, 15), max(workers, 1)
+        )
+
     output_json.write_text(
         json.dumps(
             {
                 "manifest": manifest_url,
                 "quality_policy": quality,
+                "stream_format": stream_format,
                 "min_ttl_seconds": min_ttl,
                 "generated_at": int(time.time()),
+                "dash_ready": dash_ready,
+                "dash_errors": dash_failed,
                 "records": records,
                 "errors": errors,
             },
@@ -460,20 +637,25 @@ def extract(
         encoding="utf-8",
     )
 
-    write_m3u(output_m3u, records, "combined playlist")
+    write_m3u(output_m3u, records, "combined playlist", stream_format)
     if split_catalogs:
-        by_catalog: dict[str, list[dict]] = {}
-        for record in records:
-            by_catalog.setdefault(str(record.get("catalog") or ""), []).append(record)
-        for catalog_id, catalog_records in by_catalog.items():
-            catalog_name = clean_catalog_name(catalog_records[0].get("catalog_name", ""))
-            path = playlist_dir / f"cncverse_{slugify(catalog_name)}.m3u"
-            write_m3u(path, catalog_records, f"{catalog_name} playlist")
+        write_split_playlists(records, playlist_dir, stream_format, "playlist")
+
+    if hls_fallback and stream_format != "hls":
+        hls_output = output_m3u.with_name(
+            f"{output_m3u.stem}_hls{output_m3u.suffix}"
+        )
+        write_m3u(hls_output, records, "combined HLS fallback playlist", "hls")
+        if split_catalogs:
+            hls_playlist_dir = playlist_dir.with_name(f"{playlist_dir.name}_hls")
+            write_split_playlists(records, hls_playlist_dir, "hls", "HLS fallback playlist")
 
     print(
         f"\nWrote {output_json} ({len(records)} streams, {len(errors)} errors) "
         f"and {output_m3u}"
     )
+    if stream_format == "auto":
+        print(f"DASH-ready: {dash_ready}, HLS fallback: {dash_failed}")
     if records:
         print("Quality counts:", dict(Counter(r["quality"] for r in records)))
     if errors:
@@ -529,6 +711,20 @@ def main() -> int:
         default=300,
         help="drop URLs expiring within this many seconds (default: 300)",
     )
+    parser.add_argument(
+        "--stream-format",
+        choices=("auto", "hls"),
+        default="auto",
+        help=(
+            "auto: use origin DASH/ClearKey when the key matches the MPD; "
+            "hls: keep the proxy HLS URLs"
+        ),
+    )
+    parser.add_argument(
+        "--hls-fallback",
+        action="store_true",
+        help="also write cncverse_hls.m3u and cncverse_playlists_hls/",
+    )
     args = parser.parse_args()
 
     return extract(
@@ -545,6 +741,8 @@ def main() -> int:
         args.playlist_dir,
         args.workers,
         args.min_ttl,
+        args.stream_format,
+        args.hls_fallback,
     )
 
 

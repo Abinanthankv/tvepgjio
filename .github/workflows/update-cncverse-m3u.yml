@@ -42,7 +42,9 @@ jobs:
             --quality highest \
             --split-catalogs \
             --workers 8 \
-            --min-ttl 900
+            --min-ttl 900 \
+            --stream-format auto \
+            --hls-fallback
 
       - name: Validate generated playlists
         run: |
@@ -56,8 +58,13 @@ jobs:
           if not records:
               raise SystemExit("No CNCVerse records were generated")
 
-          playlists = [Path("cncverse.m3u"), *sorted(Path("cncverse_playlists").glob("*.m3u"))]
-          if len(playlists) < 2:
+          playlists = [
+              Path("cncverse.m3u"),
+              Path("cncverse_hls.m3u"),
+              *sorted(Path("cncverse_playlists").glob("*.m3u")),
+              *sorted(Path("cncverse_playlists_hls").glob("*.m3u")),
+          ]
+          if len(playlists) < 3:
               raise SystemExit("No per-catalog CNCVerse playlists were generated")
           for playlist in playlists:
               lines = playlist.read_text(encoding="utf-8").splitlines()
@@ -74,8 +81,11 @@ jobs:
               "generated_at": data.get("generated_at"),
               "manifest": data.get("manifest"),
               "quality_policy": data.get("quality_policy"),
+              "stream_format": data.get("stream_format"),
               "min_ttl_seconds": data.get("min_ttl_seconds"),
               "records": len(records),
+              "dash_ready": data.get("dash_ready"),
+              "dash_errors": data.get("dash_errors"),
               "errors": len(data.get("errors") or []),
               "quality_counts": dict(Counter(record.get("quality", 0) for record in records)),
               "playlists": {str(path): sum(1 for line in path.read_text(encoding="utf-8").splitlines() if line.startswith("#EXTINF")) for path in playlists},
@@ -93,14 +103,14 @@ jobs:
         run: |
           set -euo pipefail
           publish_dir="$(mktemp -d)"
-          cp cncverse.m3u cncverse_status.json "$publish_dir/"
-          cp -R cncverse_playlists "$publish_dir/"
+          cp cncverse.m3u cncverse_hls.m3u cncverse_status.json "$publish_dir/"
+          cp -R cncverse_playlists cncverse_playlists_hls "$publish_dir/"
 
           cd "$publish_dir"
           git init -q -b cncverse-playlists
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add cncverse.m3u cncverse_status.json cncverse_playlists
+          git add cncverse.m3u cncverse_hls.m3u cncverse_status.json cncverse_playlists cncverse_playlists_hls
           git commit -q -m "Automated CNCVerse playlist update [skip ci]"
           git push --force \
             "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
