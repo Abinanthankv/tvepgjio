@@ -13,6 +13,8 @@ https://content.uplynk.com/channel/39919d3f7a074eefa8bf579214e952f9.m3u8
 https://content.uplynk.com/channel/c66d1d2d9e2c46cea1cf22a33f6ca488.m3u8
 #EXTINF:-1 tvg-id="abc.us" tvg-name="ABC" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/abc-us.png" group-title="USA | Local",ABC (Amagi - SD)
 https://amg01942-amg01942c3-stirr-us-10196.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 tvg-id="6508be683a0d700008c534e4" tvg-name="ABC" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/abc-us.png" group-title="USA | Local",ABC (Pluto TV - SD)
+http://cfd-v4-service-channel-stitcher-use1-1.prd.pluto.tv/stitch/hls/channel/6508be683a0d700008c534e4/master.m3u8?appName=web&appVersion=unknown&clientTime=0&deviceDNT=0&deviceId=6c265962-30d3-11ef-9cf5-e9ddff8ff496&deviceMake=Chrome&deviceModel=web&deviceType=web&deviceVersion=unknown&includeExtendedEvents=false&sid=99b21a01-5948-4846-8087-2fee1b5f0a3d&serverSideAds=false&checkedby:iptvcat.com
 #EXTINF:-1 tvg-id="abc.us" tvg-name="ABC" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/abc-us.png" group-title="USA | Local",ABC (Tubi - SD)
 https://aegis-cloudfront-1.tubi.video/d864a20b-85bb-41bc-8fbe-6c9d8a88a32d/playlist.m3u8?checkedby:iptvcat.com
 #EXTINF:-1 tvg-id="abc.us" tvg-name="ABC" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/abc-us.png" group-title="USA | Local",ABC (Tubi - SD) #2
@@ -69,6 +71,12 @@ https://cbsn-us-vtt.cbsnstream.cbsnews.com/out/v1/ef868690d34144509eda696884bf16
 https://dai.google.com/linear/hls/event/Sid4xiTQTkCT1SLu6rjUSQ/master.m3u8
 #EXTINF:-1 tvg-id="cbs.us" tvg-name="CBS" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/cbs-us.png" group-title="USA | Local",CBS (Google DAI - SD) #2
 https://dai.google.com/linear/hls/event/Sid4xiTQTkCT1SLu6rjUSQ/master.m3u8?imafw_csid=vcbs_xumo_ctv_allos_live_cbsnews;imafw__fw_h_referer=com.xumo.app&imafw__fw_did=dpid:&imafw__fw_is_lat=&imafw__fw_vcid2=&imafw__fw_app_bundle=web.xumo.com&imafw_is_lat=
+#EXTINF:-1 tvg-id="cbs.us" tvg-name="CBS" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/cbs-us.png" group-title="USA | Local",CBS (Google DAI - SD) #3
+https://dai.google.com/linear/hls/event/dHA193vxQ_WqZNVoC-W5MA/master.m3u8?imafw_csid=;imafw__fw_h_referer=com.xumo.app&imafw__fw_did=dpid:&imafw__fw_is_lat=&imafw__fw_vcid2=&imafw__fw_app_bundle=web.xumo.com&imafw_is_lat=
+#EXTINF:-1 tvg-id="cbs.us" tvg-name="CBS" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/cbs-us.png" group-title="USA | Local",CBS (Google DAI - SD) #4
+https://dai.google.com/linear/hls/event/jeTDC610T-OSPdiWhcl0Pg/master.m3u8?imafw_csid=;imafw__fw_h_referer=com.xumo.app&imafw__fw_did=dpid:&imafw__fw_is_lat=&imafw__fw_vcid2=&imafw__fw_app_bundle=web.xumo.com&imafw_is_lat=
+#EXTINF:-1 tvg-id="cbs.us" tvg-name="CBS" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/cbs-us.png" group-title="USA | Local",CBS (Google DAI - SD) #5
+https://dai.google.com/linear/hls/event/laLJwH1nS2KQAUQTF8z1Cg/master.m3u8?imafw_csid=;imafw__fw_h_referer=com.xumo.app&imafw__fw_did=dpid:&imafw__fw_is_lat=&imafw__fw_vcid2=&imafw__fw_app_bundle=web.xumo.com&imafw_is_lat=
 #EXTINF:-1 tvg-id="cbs.us" tvg-name="CBS" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/cbs-us.png" group-title="USA | Local",CBS (JMP2 - SD)
 https://jmp2.uk/plu-5dc481cda1d430000948a1b4.m3u8
 #EXTINF:-1 tvg-id="cbs.us" tvg-name="CBS" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/cbs-us.png" group-title="USA | Local",CBS (JMP2 - SD) #2
@@ -247,6 +255,8 @@ https://jmp2.uk/stvp-ITBC4000028E
 https://jmp2.uk/stvp-USBB40000028E
 #EXTINF:-1 tvg-id="nbc.us" tvg-name="NBC" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/nbc-us.png" group-title="USA | Local",NBC (LIVEHUB-VOID - SD)
 https://livehub-voidnet.onrender.com/cluster/streamcore/us/NBC_REDIS.m3u8
+#EXTINF:-1 tvg-id="nbc.us" tvg-name="NBC" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/nbc-us.png" group-title="USA | Local",NBC (PUBADS - SD)
+https://pubads.g.doubleclick.net/ssai/event/kpannrCBQ5KwdV3Hag3Wog/master.m3u8
 #EXTINF:-1 tvg-id="nbc.us" tvg-name="NBC" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/nbc-us.png" group-title="USA | Local",NBC (Tubi - SD)
 https://aegis-cloudfront-1.tubi.video/d5f0543d-5f83-4a69-ba01-c5a68f0c09a1/playlist.m3u8
 #EXTINF:-1 tvg-id="pbs.us" tvg-name="PBS" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/pbs-us.png" group-title="USA | Local",PBS (KVIEDT2 - FHD)
@@ -293,6 +303,8 @@ https://d3pxo1qcgzxtxs.cloudfront.net/10005/99951298/hls/playlist.m3u8?includeAs
 https://d3pxo1qcgzxtxs.cloudfront.net/10005/99951298/hls/playlist.m3u8?includeAssetTags=true&ads.xumo_channelId=99951298&ads.xumo_streamId=99951298&ads.channelId=99951298&ads.channelName=amcbbcnews_us&ads.csid=xumo_web_AMCBBCNews_ssai&ads._fw_coppa=0&ads._fw_content_genre=News,N,DN,Local,LocalNews,News-Local&ads.xumo_contentId=4023&ads.xumo_contentName=AMCBBCNews&ads.xumo_providerId=4023&ads.xumo_providerName=AMCBBCNews&ads._fw_is_lat=0&ads._fw_us_privacy=&ads._fw_did=:80aced8a-0dce-428e-b117-c598091cf46f&ads._fw_content_category=&ads._fw_content_language=en&ads._fw_content_rating=&ads._fw_deviceType=3-Connected_TV&ads._fw_deviceMake=GitHubAction&ads._fw_device_model=PythonScript&ads.xumo_platform=web&ads.appVersion=1.0.0&ads._fw_app_bundle=web.xumo.com&ads._fw_app_store_url=&ads._fw_ifa_type=
 #EXTINF:-1 tvg-id="bbc-news.us" tvg-name="BBC News" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/bbc-news-us.png" group-title="USA | News",BBC News (JMP2 - SD)
 https://jmp2.uk/plu-65d92a8c8b24c80008e285c0.m3u8
+#EXTINF:-1 tvg-id="bbc-news.us" tvg-name="BBC News" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/bbc-news-us.png" group-title="USA | News",BBC News (VS-HLS-PUSHB - SD)
+https://vs-hls-pushb-ww.live.cf.md.bbci.co.uk/x=4/i=urn:bbc:pips:service:bbc_arabic_tv/pc_hd_abr_v2.m3u8
 #EXTINF:-1 tvg-id="bbc-news.us" tvg-name="BBC News" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/bbc-news-us.png" group-title="USA | News",BBC News (WURLRAINBOWM - SD)
 https://wurlrainbowmedia.global.transmit.live/hls/68c49fa109574e8405506cb6/v1/amcnetworks_bbcnews_1/lg_us/latest/main/hls/playlist.m3u8
 #EXTINF:-1 tvg-id="bloomberg-tv.us" tvg-name="Bloomberg TV" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/bloomberg-us.png" group-title="USA | News",Bloomberg TV (FHD)
@@ -440,6 +452,8 @@ http://23.237.104.106:8080/USA_ACCN/mpegts
 #EXTINF:-1 tvg-id="bein-sports-xtra.us" tvg-name="beIN Sports XTRA" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/bein-sports-xtra-us.png" group-title="USA | Sports",beIN Sports XTRA (Amagi - HD)
 https://bein-xtra-xumo.amagi.tv/hls/amagi_hls_data_beinAAAAA-bein-xtra-xumoA/CDN/master.m3u8?is_lat=0&us_privacy=
 #EXTINF:-1 tvg-id="bein-sports-xtra.us" tvg-name="beIN Sports XTRA" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/bein-sports-xtra-us.png" group-title="USA | Sports",beIN Sports XTRA (Amagi - SD)
+https://amg01334-beinsportsllc-beinxtra-localnow-kcy6r.amagi.tv/playlist.m3u8
+#EXTINF:-1 tvg-id="bein-sports-xtra.us" tvg-name="beIN Sports XTRA" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/bein-sports-xtra-us.png" group-title="USA | Sports",beIN Sports XTRA (Amagi - SD) #2
 https://bein-xtra-bein.amagi.tv/playlist.m3u8
 #EXTINF:-1 tvg-id="bein-sports-xtra.us" tvg-name="beIN Sports XTRA" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/bein-sports-xtra-us.png" group-title="USA | Sports",beIN Sports XTRA (CloudFront - SD)
 https://dc1644a9jazgj.cloudfront.net/beIN_Sports_Xtra_Espanol.m3u8
@@ -503,6 +517,8 @@ http://158.172.217.18:8000/play/a014/index.m3u8
 http://158.172.217.18:8000/play/a01h/index.m3u8
 #EXTINF:-1 tvg-id="fox-sports.us" tvg-name="Fox Sports" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/fox-sports-us.png" group-title="USA | Sports",Fox Sports (SD) #4
 http://200.115.120.1:8000/play/ca126/index.m3u8
+#EXTINF:-1 tvg-id="fox-sports.us" tvg-name="Fox Sports" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/fox-sports-us.png" group-title="USA | Sports",Fox Sports (CloudFront - SD)
+https://d1jzu95oc8fgt3.cloudfront.net/FOX_Sports.m3u8
 #EXTINF:-1 tvg-id="fox-sports.us" tvg-name="Fox Sports" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/fox-sports-us.png" group-title="USA | Sports",Fox Sports (JMP2 - SD)
 https://jmp2.uk/plu-5a74b8e1e22a61737979c6bf.m3u8
 #EXTINF:-1 tvg-id="fox-sports.us" tvg-name="Fox Sports" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/fox-sports-us.png" group-title="USA | Sports",Fox Sports (JMP2 - SD) #2
@@ -958,6 +974,8 @@ http://stream.mcquack.net/231/index.m3u8
 #EXTINF:-1 tvg-id="boomerang.us" tvg-name="Boomerang" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/boomerang-us.png" group-title="USA | Kids",Boomerang (MJE - HD)
 http://23.237.104.106:8080/USA_BOOMERANG/index.m3u8
 #EXTINF:-1 tvg-id="cartoon-network.us" tvg-name="Cartoon Network" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/cartoon-network-us.png" group-title="USA | Kids",Cartoon Network (FHD)
+http://103.135.253.32:8080/CN-NETWORK/index.m3u8
+#EXTINF:-1 tvg-id="cartoon-network.us" tvg-name="Cartoon Network" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/cartoon-network-us.png" group-title="USA | Kids",Cartoon Network (FHD) #2
 http://92.114.85.87:8007/play/a009
 #EXTINF:-1 tvg-id="cartoon-network.us" tvg-name="Cartoon Network" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/cartoon-network-us.png" group-title="USA | Kids",Cartoon Network (SD)
 http://158.172.217.18:8000/play/a03a/index.m3u8
@@ -999,6 +1017,8 @@ http://158.172.217.18:8000/play/a02s/index.m3u8
 http://181.224.255.210:8001/play/a0ny/index.m3u8
 #EXTINF:-1 tvg-id="disney-jr.us" tvg-name="Disney Jr" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/disney-jr-us.png" group-title="USA | Kids",Disney Jr (SD) #3
 http://200.115.120.1:8000/play/ca009/index.m3u8
+#EXTINF:-1 tvg-id="disney-xd.us" tvg-name="Disney XD" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/disney-xd-us.png" group-title="USA | Kids",Disney XD (KINOWALK - HD)
+https://kinowalk.hopto.org/disneyxd_live
 #EXTINF:-1 tvg-id="disney-xd.us" tvg-name="Disney XD" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/disney-xd-us.png" group-title="USA | Kids",Disney XD (SD)
 http://185.227.34.179:8080/disney-xd/index.m3u8
 #EXTINF:-1 tvg-id="nick-jr.us" tvg-name="Nick Jr" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/nick-jr-us.png" group-title="USA | Kids",Nick Jr (SD)
@@ -1173,8 +1193,6 @@ https://mumbai-edge.smartplaytv.in/MTV/index.m3u8
 https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mtv-lebanon/b8ebb2a5affb812f1541712adde10e26/index.m3u8
 #EXTINF:-1 tvg-id="mtv.us" tvg-name="MTV" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/mtv-us.png" group-title="USA | Music",MTV (MJE - HD)
 http://23.237.104.106:8080/USA_MTV_LIVE/index.m3u8
-#EXTINF:-1 tvg-id="mtv.us" tvg-name="MTV" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/mtv-us.png" group-title="USA | Music",MTV (STREAM - HD)
-https://stream.ashokadigital.net/mtvlive/mtvlive/index.m3u8?origin=github.com/amazeyourself
 #EXTINF:-1 tvg-id="mtv.us" tvg-name="MTV" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/mtv-us.png" group-title="USA | Music",MTV (SD)
 http://158.172.217.18:8000/play/a033/index.m3u8
 #EXTINF:-1 tvg-id="mtv.us" tvg-name="MTV" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/mtv-us.png" group-title="USA | Music",MTV (SD) #2
@@ -1378,6 +1396,8 @@ http://181.224.200.5:2277/play/a01q/index.m3u8
 #EXTINF:-1 tvg-id="telemundo.us" tvg-name="Telemundo" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/telemundo-us.png" group-title="USA | Latino",Telemundo (SD) #5
 http://181.224.255.210:8001/play/a0ot/index.m3u8
 #EXTINF:-1 tvg-id="telemundo.us" tvg-name="Telemundo" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/telemundo-us.png" group-title="USA | Latino",Telemundo (SD) #6
+http://190.60.46.156:8089/TELEMUNDO/index.m3u8
+#EXTINF:-1 tvg-id="telemundo.us" tvg-name="Telemundo" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/telemundo-us.png" group-title="USA | Latino",Telemundo (SD) #7
 http://45.173.231.22:8000/play/a01h/index.m3u8
 #EXTINF:-1 tvg-id="telemundo.us" tvg-name="Telemundo" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/telemundo-us.png" group-title="USA | Latino",Telemundo (CloudFront - SD)
 https://d1kq7q3vteqjb.cloudfront.net/master.m3u8
@@ -1408,8 +1428,10 @@ https://i.imgur.com/sxNI7nx.png",Telemundo
 #EXTINF:-1 tvg-id="telemundo.us" tvg-name="Telemundo" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/telemundo-us.png" group-title="USA | Latino",Telemundo (JMP2 - SD)
 https://jmp2.uk/plu-65790feacbd0d60008fac87a.m3u8
 #EXTINF:-1 tvg-id="telemundo.us" tvg-name="Telemundo" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/telemundo-us.png" group-title="USA | Latino",Telemundo (Xumo - SD)
-https://xumo-drct-ch836-57aiq.fast.nbcuni.com/live/master.m3u8
+https://xumo-drct-ch835-ekq0p.fast.nbcuni.com/live/master.m3u8
 #EXTINF:-1 tvg-id="telemundo.us" tvg-name="Telemundo" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/telemundo-us.png" group-title="USA | Latino",Telemundo (Xumo - SD) #2
+https://xumo-drct-ch836-57aiq.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 tvg-id="telemundo.us" tvg-name="Telemundo" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/telemundo-us.png" group-title="USA | Latino",Telemundo (Xumo - SD) #3
 https://xumo-xumoent-ch827-uj0ch.fast.nbcuni.com/live/master.m3u8
 #EXTINF:-1 tvg-id="univision.us" tvg-name="Univision" tvg-logo="https://raw.githubusercontent.com/yowmamasita/usa-tv-next/main/public/logos/usa/univision-us.png" group-title="USA | Latino",Univision (FHD)
 http://138.121.15.230:9002/UNIVISION/index.m3u8
