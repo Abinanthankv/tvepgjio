@@ -64,9 +64,10 @@ https://github.com/Abinanthankv/tvepgjio/tree/cncverse-playlists/cncverse_playli
 
 * The CNCVerse worker refreshes the playlists every **3 hours** because the
   provider tokens are short-lived.
-* `cncverse.m3u` is best for players with **DASH + ClearKey** support. Kodi
-  needs InputStream Adaptive. TiviMate/OTT Navigator usually work for Jio TV
-  and SUN NXT; JioHotstar/JIOTV+ may still need provider `Cookie` headers.
+* `cncverse.m3u` is intended for players with **DASH + ClearKey** support
+  (Kodi with InputStream Adaptive, and current TiviMate/OTT Navigator
+  builds). Jio TV and SUN NXT use origin MPDs that do not need extra
+  headers; JioHotstar/JIOTV+ may still need provider `Cookie` headers.
 * `cncverse_hls.m3u` keeps the proxy HLS URLs. It is the fallback for
   HLS-only players.
 * **VLC is not supported for most CNCVerse channels.** The proxy rejects
