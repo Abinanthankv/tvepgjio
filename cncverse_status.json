@@ -1,0 +1,30 @@
+{
+  "generated_at": 1795259249,
+  "manifest": "https://cncverse.dpdns.org/u/p_j98yszu454o7/manifest.json",
+  "quality_policy": "highest",
+  "stream_format": "auto",
+  "min_ttl_seconds": 900,
+  "records": 8117,
+  "dash_ready": 4,
+  "dash_errors": 1812,
+  "errors": 1,
+  "quality_counts": {
+    "0": 6206,
+    "1080": 1313,
+    "720": 37,
+    "480": 24,
+    "576": 537
+  },
+  "playlists": {
+    "cncverse.m3u": 8117,
+    "cncverse_hls.m3u": 8117,
+    "cncverse_playlists/cncverse_clown-iptv.m3u": 5802,
+    "cncverse_playlists/cncverse_jio-tv-ind.m3u": 1104,
+    "cncverse_playlists/cncverse_jiotv-ind-3.m3u": 1178,
+    "cncverse_playlists/cncverse_sun-nxt.m3u": 33,
+    "cncverse_playlists_hls/cncverse_clown-iptv.m3u": 5802,
+    "cncverse_playlists_hls/cncverse_jio-tv-ind.m3u": 1104,
+    "cncverse_playlists_hls/cncverse_jiotv-ind-3.m3u": 1178,
+    "cncverse_playlists_hls/cncverse_sun-nxt.m3u": 33
+  }
+}
